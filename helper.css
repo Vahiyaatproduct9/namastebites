@@ -417,36 +417,7 @@ section.foot p {
 }
 
 @media (aspect-ratio < 5/8) {
-	nav.head-nav>.bar>li {
-		display: none;
-	}
 
-	nav.head-nav {
-		height: 80px;
-	}
-
-	.box {
-		left: 0;
-		margin: 0;
-		display: flex;
-		flex-direction: column;
-		list-style: none;
-		position: absolute;
-		margin-top: 80px;
-		align-items: center;
-		justify-content: center;
-		width: 100%;
-	}
-
-	.box li {
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 20px;
-		width: 100%;
-		font-size: 20px;
-	}
 
 	section.foot .foot-container {
 		display: block;
@@ -485,6 +456,16 @@ section.foot p {
 		justify-content: space-around;
 	}
 
+
+
+	/* .contact .bottom-sticky ul .call::after {
+		content: 'Call Us';
+		font-family: Inter;
+		font-size: 20px;
+	} */
+}
+
+@media (aspect-ratio < 1/1) {
 	nav.head-nav .toggle {
 		padding: 18px;
 		display: block;
@@ -499,9 +480,40 @@ section.foot p {
 		width: 60px;
 	}
 
-	/* .contact .bottom-sticky ul .call::after {
-		content: 'Call Us';
-		font-family: Inter;
+	nav.head-nav>.bar>li {
+		display: none;
+	}
+
+	nav.head-nav {
+		height: 80px;
+	}
+
+	.box {
+		left: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		list-style: none;
+		position: absolute;
+		margin-top: 80px;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.box li {
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+		width: 100%;
 		font-size: 20px;
-	} */
+	}
+}
+
+@media (aspect-ratio < 8/7) {
+	.gallery div .info p {
+		display: none;
+	}
 }
