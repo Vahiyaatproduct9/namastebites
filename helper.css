@@ -1,0 +1,507 @@
+body {
+	background: #cccccc;
+	margin: 0;
+	margin-top: 100px;
+	padding: 0;
+}
+
+nav.head-nav {
+	backdrop-filter: blur(10px);
+	display: flex;
+	justify-content: space-around;
+	z-index: 1;
+	background: rgba(255, 255, 255, 0.6);
+	box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.7);
+	padding: 0;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 80px;
+}
+
+nav.head-nav>.bar {
+	margin-top: 20px;
+	cursor: pointer;
+	list-style: none;
+	display: flex;
+	justify-content: space-evenly;
+	font-family: WDXL Lubrifont TC;
+	font-size: 23px;
+}
+
+nav.head-nav .bar>li {
+	margin: 0 30px;
+	transition: all 0.1s ease;
+}
+
+nav.head-nav .bar #home {
+	font-weight: 500;
+	letter-spacing: 7px;
+	text-decoration: underline;
+}
+
+nav.head-nav .bar>li:hover {
+	transform: scale(1.1);
+}
+
+nav.head-nav .brand {
+	position: absolute;
+	top: 20px;
+	left: 30px;
+	font-family: Gochi Hand;
+	display: flex;
+}
+
+nav.head-nav .brand h3 {
+	padding: 5px;
+	margin-left: 7px;
+}
+
+nav.head-nav .brand img {
+	height: 30px;
+}
+
+nav.head-nav .follow {
+	cursor: pointer;
+	position: absolute;
+	right: 0;
+	top: 0;
+	display: flex;
+}
+
+
+nav.head-nav .follow a div {
+	height: 80px;
+	width: 100px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
+nav.head-nav .follow a div:hover {
+	margin-top: 15px;
+}
+
+nav.head-nav .follow a div:hover p {
+	display: block;
+}
+
+nav.head-nav .follow p {
+	display: none;
+}
+
+nav.head-nav>div>a>div>img {
+	opacity: 0.8;
+	height: 30px;
+	width: 30px;
+}
+
+nav.head-nav .toggle {
+	display: none;
+}
+
+.top {
+	border-radius: 30px;
+	border: 5px solid black;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 100%;
+	height: 800px;
+	margin: 0;
+	padding: 0;
+}
+
+.front-img {
+	background-image: url('./images/namaste-bites-front.webp');
+	background-position: center;
+	object-fit: cover;
+	height: 100%;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	border-radius: 20px;
+	transition: all 0.1s ease;
+	background-repeat: no-repeat;
+}
+
+.front-img>.image {
+	width: 100%;
+	object-fit: cover;
+
+}
+
+.front-img>.main-logo {
+	position: absolute;
+	height: 200px;
+	bottom: -34px;
+	transition: all 0.2s ease;
+}
+
+.main>.header {
+	user-select: none;
+	position: relative;
+	text-align: center;
+	font-size: 80px;
+	margin-top: 10px;
+	margin-bottom: 100px;
+	font-family: 'Gochi Hand';
+}
+
+section.blur-layer {
+	border: 5px solid black;
+	padding: 100px 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-evenly;
+	backdrop-filter: blur(10px);
+	border-radius: 20px;
+	gap: 50px;
+}
+
+section.blur-layer text {
+	color: white;
+	font-size: 40px;
+	font-family: Ancizar Sans;
+
+}
+
+section.blur-layer .menu-option {
+	position: relative;
+	padding: 20px 60px;
+	font-size: 20px;
+	color: white;
+	background: transparent;
+	border: 4px solid white;
+	border-radius: 20px;
+	transition: all 0.1s ease-in-out;
+
+}
+
+section.blur-layer .menu-option:hover {
+	transform: scale(1.1);
+}
+
+section.blur-layer .menu-option:active {
+	transition: none;
+	transform: scale(1.1);
+	border-color: grey;
+}
+
+
+section.menu {
+	border-radius: 20px;
+	overflow: hidden;
+	margin: 80px 0;
+	border-radius: 20px;
+	overflow: hidden;
+	background-image: url(images/chicken-biryani.jpg);
+	transition: all 0.2s;
+	animation-name: changeBackground;
+	animation-duration: 15s;
+	animation-iteration-count: infinite;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+}
+
+@keyframes changeBackground {
+	100% {
+		background-image: url(images/veg-momos.jpg);
+	}
+
+	12.5% {
+		background-image: url(images/chicken-biryani.jpg);
+	}
+
+	25% {
+		background-image: url(images/chicken-lollipop.jpg);
+	}
+
+	37.5% {
+		background-image: url(images/chicken-momos.jpg);
+	}
+
+	50% {
+		background-image: url(images/chicken-pakoda.jpg);
+	}
+
+	62.5% {
+		background-image: url(images/egg-fried-rice.jpg);
+	}
+
+	75% {
+		background-image: url(images/egg-roll.jpg);
+	}
+
+	87.5% {
+		background-image: url(images/veg-hakka-noodles.jpg);
+	}
+
+}
+
+#menu {
+	align-items: center;
+	justify-content: center;
+	display: none;
+	flex-wrap: wrap;
+	flex-grow: 1;
+	gap: 30px;
+	padding: 20px;
+}
+
+#menu>div {
+	background: grey;
+	border-radius: 20px;
+	height: 400px;
+	width: 300px;
+	transition: all 0.1s ease-in-out;
+}
+
+#menu>div:hover {
+	transform: scale(1.1);
+	box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.7);
+}
+
+#menu>div #item-image {
+	margin: 10px;
+	border-radius: 20px;
+	height: 280px;
+	background-position: center;
+	background-size: cover;
+	transition: all 0.1s ease-in-out;
+}
+
+#menu>div #item-info {
+	padding: 15px;
+	font-family: Inter;
+	color: #cccccc;
+}
+
+
+.gallery {
+	border: 5px solid black;
+	text-align: center;
+	border-radius: 20px;
+	background: #222;
+	padding: 20px;
+}
+
+.gallery>text {
+	color: #cccccc;
+	font-family: Handlee;
+	font-size: 50px;
+}
+
+.gallery>div {
+	border: 5px solid white;
+	overflow: hidden;
+	border-radius: 20px;
+	display: flex;
+	height: 400px;
+	background: #333;
+	margin: 20px;
+	text-align: center;
+	color: white;
+	font-family: 'Open Sans';
+	line-height: 50px;
+	font-size: 17px;
+
+}
+
+.gallery .info {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+}
+
+.gallery div>img {
+	object-fit: cover;
+	object-position: center;
+	width: 500px;
+	right: 0;
+	height: 400px;
+}
+
+section.foot {
+	margin-top: 30px;
+	text-align: center;
+	margin-bottom: 120px;
+	padding: 30px;
+	background: #222;
+	color: #cccccc;
+	transition: all 0.3s ease;
+}
+
+section.foot .foot-container {
+	justify-content: space-around;
+	display: flex;
+	align-items: center;
+}
+
+
+section.foot .owner-div {
+	border-radius: 20px;
+	min-width: 300px;
+	height: 500px;
+	background-image: url(images/owner.png);
+	background-position: center;
+	margin: 20px;
+	width: 300px;
+}
+
+/* 
+section.foot .owner-div {
+	width: 600px;
+} */
+
+section.foot text {
+	text-align: center;
+	font-size: 60px;
+}
+
+section.foot p {
+	max-width: 800px;
+	padding: 20px;
+	line-height: 40px;
+}
+
+.contact {
+	z-index: 1;
+	background: lightgrey;
+	display: flex;
+	position: fixed;
+	bottom: 0;
+	border: 5px solid black;
+	border-radius: 10px;
+	animation-name: up;
+	animation-duration: 0.3s;
+	animation-delay: 2s;
+
+}
+
+.contact .bottom-sticky ul {
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	margin-top: 20px;
+	list-style: none;
+}
+
+.contact .bottom-sticky {
+	text-align: center;
+}
+
+.contact .bottom-sticky text {
+	font-family: Segoe Print;
+	font-size: 30px;
+}
+
+.contact .bottom-sticky ul li {
+	display: flex;
+	padding: 0 30px;
+	transition: all 0.1s ease;
+}
+
+.contact .bottom-sticky ul li:hover {
+	transform: scale(1.1) translateY(-10px);
+}
+
+.contact .bottom-sticky ul li div img {
+	height: 50px;
+}
+
+@media (aspect-ratio < 5/8) {
+	nav.head-nav>.bar>li {
+		display: none;
+	}
+
+	nav.head-nav {
+		height: 80px;
+	}
+
+	.box {
+		left: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		list-style: none;
+		position: absolute;
+		margin-top: 80px;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+	}
+
+	.box li {
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 20px;
+		width: 100%;
+		font-size: 20px;
+	}
+
+	section.foot .foot-container {
+		display: block;
+	}
+
+	section.foot .owner-container {
+		display: flex;
+		justify-content: center;
+	}
+
+	.contact .bottom-sticky text {
+		display: none;
+	}
+
+	.contact {
+		width: 100%;
+	}
+
+	.contact .bottom-sticky {
+		width: 100%;
+	}
+
+	.contact .bottom-sticky ul .email {
+		display: none;
+	}
+
+	.contact .bottom-sticky ul li {
+		padding: 0;
+		margin: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.contact .bottom-sticky ul {
+		justify-content: space-around;
+	}
+
+	nav.head-nav .toggle {
+		padding: 18px;
+		display: block;
+	}
+
+	nav.head-nav .toggle img {
+		height: 40px;
+
+	}
+
+	nav.head-nav .follow a div {
+		width: 60px;
+	}
+
+	/* .contact .bottom-sticky ul .call::after {
+		content: 'Call Us';
+		font-family: Inter;
+		font-size: 20px;
+	} */
+}
