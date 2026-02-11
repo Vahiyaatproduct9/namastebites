@@ -1,0 +1,58 @@
+[
+    {
+      "id": "1",
+      "name": "Samosa",
+      "description": "Crispy pastry with savory potato and pea filling.",
+      "price": 4.99,
+      "category": "Starters",
+      "image": "/images/samosa.jpg"
+    },
+    {
+      "id": "2",
+      "name": "Paneer Tikka",
+      "description": "Grilled पनीर (paneer) cubes marinated in spices.",
+      "price": 12.50,
+      "category": "Starters",
+      "image": "/images/paneer-tikka.jpg"
+    },
+    {
+      "id": "3",
+      "name": "Chicken Biryani",
+      "description": "Fragrant basmati rice cooked with succulent chicken and aromatic spices.",
+      "price": 16.99,
+      "category": "Main Dish",
+      "image": "/images/chicken-biryani.jpg"
+    },
+    {
+      "id": "4",
+      "name": "Butter Chicken",
+      "description": "Creamy tomato-based curry with tender chicken pieces.",
+      "price": 15.50,
+      "category": "Main Dish",
+      "image": "/images/butter-chicken.jpg"
+    },
+    {
+      "id": "5",
+      "name": "Naan Bread",
+      "description": "Soft, fluffy Indian bread baked in a tandoor.",
+      "price": 2.50,
+      "category": "Sides",
+      "image": "/images/naan.jpg"
+    },
+    {
+      "id": "6",
+      "name": "Gulab Jamun",
+      "description": "Deep-fried milk solids soaked in a rose-flavored sugar syrup.",
+      "price": 5.99,
+      "category": "Desserts",
+      "image": "/images/gulab-jamun.jpg"
+    },
+    {
+      "id": "7",
+      "name": "Mango Lassi",
+      "description": "Refreshing yogurt drink with sweet mango pulp.",
+      "price": 4.00,
+      "category": "Drinks",
+      "image": "/images/mango-lassi.jpg"
+    }
+]

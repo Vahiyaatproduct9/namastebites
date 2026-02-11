@@ -19,7 +19,10 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@api/*": ["./app/api/*"],
+      "@styles/*": ["./app/styles/*"],
+      "@store/*": ["./app/store/*"]
     }
   },
   "include": [
@@ -28,7 +31,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
-    "**/*.mts"
+    "**/*.mts",
+    "**/*.css"
   ],
   "exclude": ["node_modules"]
 }
