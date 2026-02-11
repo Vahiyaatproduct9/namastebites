@@ -1,4 +1,3 @@
-
 CREATE TYPE orderstatus AS ENUM (
     'pending',
     'confirmed',
@@ -28,7 +27,6 @@ CREATE TYPE category AS ENUM (
     'side_dish'
 );
 
-
 create table users (
 user_id serial primary key,
 name varchar(50) not null,
@@ -51,7 +49,6 @@ constraint ensure_payment_method check
 (payment_method != 'online'::paymentmethod or razorpay_transaction_id is not null)
 );
 
-
 create table location (
     id serial primary key,
     latitude float default null,
@@ -60,7 +57,6 @@ create table location (
     zip_code varchar(6) constraint check_zip_code check (LENGTH(zip_code) = 6),
     constraint check_location check((latitude is null and longitude is null) or (address is not null))
 );
-
 
 create table orders (
     id serial primary key,
