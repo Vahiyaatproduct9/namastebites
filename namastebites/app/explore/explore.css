@@ -1,0 +1,38 @@
+.explore-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  .explore {
+    max-width: 1500px;
+    width: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .explore-header {
+      width: 100%;
+      .explore-text {
+        text-align: right;
+        font-size: var(--font-large);
+        font-weight: 600;
+      }
+    }
+    .explore-search {
+      width: 100%;
+      max-width: 500px;
+      input {
+        width: 100%;
+        padding: 0.5rem 2rem;
+        border-radius: 25px;
+        border: none;
+        background: rgba(100,100,100,0.5);
+        outline: none;
+        font-size: var(--font-med);
+        font-family: 'JetBrains Mono', 'sans serif';
+        font-weight: 600;
+      }
+    }
+  }
+}
