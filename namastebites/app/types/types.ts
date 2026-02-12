@@ -5,3 +5,10 @@ export type Food = {
   price: number;
   quantity: number
 }
+
+export type Item = {
+  id: string;
+  name: string;
+  price: number;
+  url: string;
+}
