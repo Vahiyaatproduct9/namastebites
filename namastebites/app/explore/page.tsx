@@ -1,7 +1,8 @@
+import Image from "next/image";
 import Items from "../components/items"
 import { Item } from "../types/types";
 import "./explore.css"
-export default () => {
+const Explore = () => {
   const items: Item[] = [];
   for (let i = 0; i < 5; i++) {
     items.push({
@@ -21,9 +22,9 @@ export default () => {
           <input type="text" placeholder="Search" />
         </div>
         <div className="explore-body">
-          <Items items={items} Component={({ item }) => {
+          <Items className="" items={items} Component={({ item }) => {
             return (
-              <div>
+              <div className="item-container">
                 {item.name}
               </div>
             )
@@ -33,3 +34,5 @@ export default () => {
     </div>
   )
 }
+
+export default Explore;
