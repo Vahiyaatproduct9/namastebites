@@ -23,7 +23,7 @@ export default () => {
         <div className="explore-body">
           <Items items={items} Component={({ item }) => {
             return (
-              <div>
+              <div className="item-body">
                 {item.name}
               </div>
             )
