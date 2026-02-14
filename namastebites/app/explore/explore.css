@@ -35,13 +35,38 @@
       }
     }
     .explore-body {
-      background: red;
       width: 100%;
+      margin: 0 auto;
+      padding: 1rem;
       display: flex;
-      flex-direction: row;
-      flex-wrap: wrap;
       justify-content: center;
       align-items: center;
+      .item-container {
+        width: 100%;
+        height: 200px;
+        background: rgba(100,100,100,0.5);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+      }
     }
   }
 }
+
+/* backgroundImage: `url(${item.url})`,
+backgroundOrigin: 'border-box',
+backgroundPosition: 'center',
+objectFit: 'cover',
+width: '100%',
+height: '100%',
+borderRadius: '10px',
+display: 'flex',
+alignItems: 'center',
+justifyContent: 'center',
+color: 'white',
+fontSize: '20px',
+fontWeight: 'bold' */
