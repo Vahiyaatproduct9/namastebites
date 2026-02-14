@@ -1,14 +1,14 @@
-import { Item } from "../types/types"
+import { Food } from "../types/types"
 import "./items.css"
 
 type propType = {
-  items: Item[];
-  Component: React.FC<{ item: Item }>;
+  items: Food[];
+  Component: React.FC<{ item: Food }>;
   className?: string;
 }
 const Items = (props: propType) => {
   const { items, Component } = props;
-  
+
   const FoodItems = () => {
     return items.map(item => {
       return (

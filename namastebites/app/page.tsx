@@ -3,6 +3,7 @@ import "./home.css";
 import { Food } from "./types/types";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import PriceFooter from "./components/priceFooter/priceFooter";
 export default function Home() {
   const router = useRouter()
   const [items, setItems] = useState<Food[]>([]);
@@ -87,19 +88,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      {items.reduce((a, b) => a + b.price * b.quantity, 0) > 0 && (
-        <div className="footer">
-          <div className="px-2 py-1 max-w-[1200px] items-center gap-[10px] justify-between flex  mx-auto">
-            <div className="flex justify-between w-full">
-              <div className="text-lg">Subtotal</div>
-              <div className="text-lg">₹{items.reduce((a, b) => a + b.price * b.quantity, 0)}</div>
-            </div>
-            <button className="max-w-[300px] w-full bg-red-600 text-white py-4 rounded-2xl active:scale-[0.95] transition duration-300 ease-in-out">
-              CHECKOUT
-            </button>
-          </div>
-        </div>
-      )}
+      <PriceFooter />
     </>
   );
 }
