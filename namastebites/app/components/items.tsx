@@ -1,11 +1,14 @@
 import { Item } from "../types/types"
 import "./items.css"
+
 type propType = {
   items: Item[];
-  Component: React.FC<{ item: Item }>
+  Component: React.FC<{ item: Item }>;
+  className?: string;
 }
-export default (props: propType) => {
+const Items = (props: propType) => {
   const { items, Component } = props;
+  
   const FoodItems = () => {
     return items.map(item => {
       return (
@@ -14,8 +17,11 @@ export default (props: propType) => {
     })
   }
   return (
-    <div className="items">
-      <FoodItems />
+    <div className={`items ${props.className || ''}`}>
+      {/* eslint-disable-next-line react-hooks/static-components */}
+      {items.length > 0 ? <FoodItems /> : <div>No items found</div>}
     </div>
   )
 }
+
+export default Items;
