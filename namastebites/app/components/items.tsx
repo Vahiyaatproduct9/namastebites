@@ -1,5 +1,5 @@
 import { Item } from "../types/types"
-
+import "./items.css"
 type propType = {
   items: Item[];
   Component: React.FC<{ item: Item }>
