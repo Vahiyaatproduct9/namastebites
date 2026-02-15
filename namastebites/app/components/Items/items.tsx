@@ -1,4 +1,4 @@
-import { Food } from "../types/types"
+import { Food } from "../../types/types"
 import "./items.css"
 
 type propType = {

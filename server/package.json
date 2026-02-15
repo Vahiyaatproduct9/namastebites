@@ -10,6 +10,7 @@
     "pg": "^8.18.0"
   },
   "devDependencies": {
+    "@types/pg": "^8.16.0",
     "bun-types": "latest"
   },
   "module": "src/index.js"
