@@ -1,12 +1,14 @@
 'use client';
 import Image from "next/image";
-import Items from "../components/items"
+import Items from "../components/Items/items"
 import { Food } from "../types/types";
 import "./explore.css"
 import { useCart } from "../store/useCart";
 import { useEffect } from "react";
 import PriceFooter from "../components/priceFooter/priceFooter";
+import { useRouter } from "next/navigation";
 const Explore = () => {
+  const router = useRouter();
   const items: Food[] = [];
   for (let i = 0; i < 5; i++) {
     items.push({
@@ -24,12 +26,15 @@ const Explore = () => {
     console.log('cart: ', cart);
   }, [cart]);
   const addButton = (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+    e.stopPropagation();
     addToCart(items.find(t => t.id === id)!);
   }
   const removeButton = (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+    e.stopPropagation();
     decreaseQuantity(id);
+  }
+  const goToItem = (id: string) => {
+    router.push(`/item/${id}`);
   }
   return (
     <div className="explore-container">
@@ -39,11 +44,18 @@ const Explore = () => {
         </div>
         <div className="explore-search">
           <input type="text" placeholder="Search" />
+          <button className="filter-button">
+            <span className="material-symbols-outlined">
+              page_info
+            </span>
+          </button>
         </div>
         <div className="explore-body">
-          <Items className="" items={items} Component={({ item }) => {
+          <Items items={items} Component={({ item }) => {
             return (
-              <div style={{ backgroundImage: `url(${item.url})` }} className="item-container">
+              <div style={{ backgroundImage: `url(${item.url})` }} className="item-container"
+                onClick={() => goToItem(item.id)}
+              >
                 <div className="item-description-container">
                   {[0, undefined, -1].includes(cart.find(t => t.id === item.id)?.quantity) ? (
                     <>
