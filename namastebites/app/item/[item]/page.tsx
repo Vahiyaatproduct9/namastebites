@@ -6,13 +6,7 @@ import PriceFooter from "@/app/components/priceFooter/priceFooter";
 
 const Item = ({ params }: { params: Usable<{ item: string }> }) => {
   const { item } = use<{ item: string }>(params);
-  const itemData = {
-    id: item,
-    name: 'Plain Samosa',
-    url: 'https://picsum.photos/seed/1234/400/400',
-    price: 10,
-    description: "This is a delicious item. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-  };
+  // const {}
   const increaseQuantity = useCart(s => s.addToCart)
   const decreaseQuantity = useCart(s => s.decreaseQuantity);
   const cart = useCart(s => s.cart);

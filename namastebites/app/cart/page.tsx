@@ -4,7 +4,8 @@ import React, { useEffect } from "react";
 import "./cart.css"
 import { useRouter } from "next/navigation";
 import { useCart } from "@store/useCart"
-import { Food } from "../types/types";
+import { CartItem, Food, PaymentPostBodyType } from "../types/types";
+import Order from "@api/payment/orders";
 const Cart = () => {
   const router = useRouter();
   const cart = useCart(s => s.cart);
@@ -19,6 +20,13 @@ const Cart = () => {
 
   const goToExplore = () => {
     router.push("/explore");
+  }
+
+  const checkout = async () => {
+    const data: CartItem[] = cart;
+    const newOrder = new Order(data);
+    const response = await newOrder.initiatePayment();
+    console.log("response:", response);
   }
 
   return (
@@ -80,7 +88,7 @@ const Cart = () => {
                   <button className="checkout-button"
                     disabled={totalPrice === 0}
                     style={{ opacity: totalPrice === 0 ? 0.5 : 1, cursor: totalPrice === 0 ? 'not-allowed' : 'pointer' }}
-                    onClick={() => {}}>
+                    onClick={checkout}>
                     Proceed to Checkout
                   </button>
                 </div>
