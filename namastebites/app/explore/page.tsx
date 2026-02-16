@@ -1,24 +1,37 @@
 'use client';
-import Image from "next/image";
 import Items from "../components/Items/items"
 import { Food } from "../types/types";
 import "./explore.css"
 import { useCart } from "../store/useCart";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import PriceFooter from "../components/priceFooter/priceFooter";
 import { useRouter } from "next/navigation";
+import { getItems } from "../functions/api/explore/explore";
 const Explore = () => {
   const router = useRouter();
-  const items: Food[] = [];
-  for (let i = 0; i < 5; i++) {
-    items.push({
-      id: i.toString(),
-      name: "Item " + i,
-      price: i * 10 + 13,
-      url: 'https://picsum.photos/seed/1234/400/400',
-      quantity: 0
+  const [items, setItems] = useState<Food[]>([]);
+  useEffect(() => {
+    getItems()
+    .then(res => {
+      console.log(res);
+      if (res.status !== 200) {
+        console.error('Failed to fetch items');
+        return;
+      }
+      res.data?.items?.map(item => {
+        setItems(prev => [...prev, {
+          id: item.item_id.toString(),
+          name: item.name,
+          price: Number(item.price),
+          url: item.image_url,
+          quantity: 0,
+        }])
+      });
+      console.log('items: ', items);
     })
-  }
+    return (() => setItems([]))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const cart = useCart(s => s.cart);
   const addToCart = useCart(s => s.addToCart);
   const decreaseQuantity = useCart(s => s.decreaseQuantity);
