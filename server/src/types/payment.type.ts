@@ -7,5 +7,9 @@ const paymentOrderSchema = z.object({
     }),
   ),
 });
-
-export { paymentOrderSchema };
+const exploreRequestBody = z.object({
+  single: z.string().optional(),
+  limit: z.number().optional(),
+  offset: z.number().optional(),
+});
+export { paymentOrderSchema, exploreRequestBody };

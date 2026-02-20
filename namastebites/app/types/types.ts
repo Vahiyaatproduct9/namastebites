@@ -45,3 +45,9 @@ export type ResponseType<T> = {
   error?: string;
   data: T | null;
 };
+
+export type FilterType = {
+  id: string;
+  value: string | Date[] | number[] | string[] | number;
+  type: "multi-select" | "global-search" | "date" | "range";
+}[];
