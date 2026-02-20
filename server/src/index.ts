@@ -3,7 +3,9 @@ const port = process.env.PORT || 8000;
 import exploreRouter from "@router/explore.router";
 import paymentRouter from "@router/payment.router";
 import cors from "@elysiajs/cors";
+import { errorHandler } from "./middleware/error-handler";
 const app = new Elysia()
+  .onError(errorHandler)
   .use(
     cors({
       origin: "*",

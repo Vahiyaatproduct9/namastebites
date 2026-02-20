@@ -1,15 +1,18 @@
 'use client';
 import Items from "../components/Items/items"
-import { Food } from "../types/types";
+import { FilterType, Food } from "../types/types";
 import "./explore.css"
 import { useCart } from "../store/useCart";
 import { useEffect, useState } from "react";
 import PriceFooter from "../components/priceFooter/priceFooter";
 import { useRouter } from "next/navigation";
 import { getItems } from "../functions/api/explore/explore";
+import Filter from "../components/Filter/Filter";
 const Explore = () => {
   const router = useRouter();
   const [items, setItems] = useState<Food[]>([]);
+  const [filterShown, setFilterShown] = useState(false);
+  const [filters, setFilters] = useState<FilterType>([]);
   useEffect(() => {
     getItems()
     .then(res => {
@@ -49,15 +52,22 @@ const Explore = () => {
   const goToItem = (id: string) => {
     router.push(`/item/${id}`);
   }
+  const handleFilter = () => {
+
+  }
   return (
     <div className="explore-container">
+      {filterShown && <Filter setFilterShown={setFilterShown} setFilters={setFilters}/>}
       <div className="explore">
         <div className="explore-header">
           <h1 className="explore-text">Explore</h1>
         </div>
         <div className="explore-search">
           <input type="text" placeholder="Search" />
-          <button className="filter-button">
+          <button
+          className="filter-button"
+          onClick={() => setFilterShown(!filterShown)}
+          >
             <span className="material-symbols-outlined">
               page_info
             </span>
@@ -68,6 +78,7 @@ const Explore = () => {
             return (
               <div style={{ backgroundImage: `url(${item.url})` }} className="item-container"
                 onClick={() => goToItem(item.id)}
+                key={item.id}
               >
                 <div className="item-description-container">
                   {[0, undefined, -1].includes(cart.find(t => t.id === item.id)?.quantity) ? (
