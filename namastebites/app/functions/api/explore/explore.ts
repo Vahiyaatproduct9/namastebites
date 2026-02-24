@@ -1,19 +1,37 @@
 import path from "@/app/path/path";
-import { exploreItemType, ResponseType } from "@/app/types/types";
+import {
+  exploreItemType,
+  FilterType,
+  ResponseType,
+  SortType,
+} from "@/app/types/types";
 type ItemRequestType = {
   single: string;
 };
 type ListRequestType = {
-  limit?: number;
-  offset?: number;
+  filter?: FilterType[];
+  sorting?: SortType | null;
+  limit?: number | null;
+  offset?: number | null;
+  globalSearch?: string | null;
 };
 type ExploreRequestType = ItemRequestType | ListRequestType;
 async function explore(props?: ExploreRequestType) {
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(props || {})) {
-    params.append(key, value);
-  }
-  const response = await fetch(`${path}/explore?${params.toString()}`);
+  // const info = {
+  //   single: null,
+  //   sorting: null,
+  //   limit: null,
+  //   offset: null,
+  //   globalSearch: null,
+  //   ...props,
+  // };
+  const response = await fetch(`${path}/explore`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(props),
+  });
   const data = await response.json();
   return data;
 }

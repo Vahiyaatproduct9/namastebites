@@ -39,7 +39,9 @@ html {
   }
 }
 .body {
-  background-image: url("/mountain.jpg");
+  overflow-x: hidden;
+  box-sizing: border-box;
+  background-image: url("/background.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -48,6 +50,7 @@ html {
   min-width: 100vw;
   align-items: center;
   .hero {
+    box-sizing: border-box;
     width: 100%;
     top: 50px;
     padding: 32px;
@@ -59,72 +62,69 @@ html {
     justify-content: right;
     font-size: var(--font-ex-large);
   }
+  .header {
+    box-sizing: border-box;
+    max-width: 1500px;
+    padding: 1rem 1.2rem;
+    width: 100%;
+    text-align: right;
+    font-size: var(--font-large);
+    font-weight: 600;
+    font-family: "DM Serif Text", serif;
+  }
   .items {
-    padding: 1.2rem;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    .header {
-      max-width: 1500px;
-      padding: 1rem 1.2rem;
-      width: 100%;
-      text-align: right;
-      font-size: var(--font-large);
-      font-weight: 600;
-      font-family: 'DM Serif Text', serif;
-    }
+    flex-wrap: wrap;
     .items-body {
-      display: grid;
-      grid-gap: 10px;
-      align-content: center;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      grid-template-rows: repeat(auto-fit, minmax(200px, 1fr));
+      flex-direction: row;
       width: 100%;
-      max-width: 1400px;
-      @media screen and (min-aspect-ratio: 16/9) {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        grid-template-rows: repeat(auto-fit, minmax(250px, 1fr));
-      }
+      margin: 0 auto;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      max-width: 1200px;
+      flex-wrap: wrap;
       .item {
+        flex: 1;
+        min-width: 350px;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.3);
         --item-radius: 25px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background: white;
-        justify-content: end;
-        border-radius: var(--item-radius);
+        width: 100%;
+        max-width: 400px;
+        height: 250px;
+        border-radius: 10px;
         overflow: hidden;
-        position: relative;
-        transition-duration: 0.2s;
-        cursor: pointer;
-        min-width: 160px;
-        min-height: 200px;
-        max-width: 200px;
-        max-height: 250px;
-        .thumbnail {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          position: absolute;
-          aspect-ratio: 1;
-          background-size: cover;
-          background-clip: border-box;
-          background-repeat: no-repeat;
-          background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        background-origin: border-box;
+        background-position: center;
+        object-fit: cover;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-clip: border-box;
+        transition-duration: 500ms;
+        &:active {
+          transform: scale(0.98);
         }
         .item-description-container {
           --item-pad: 1rem;
-          background: linear-gradient(0deg, rgba(0,0,0,0.6), transparent);
+          --item-radius: 25px;
+          background: linear-gradient(0deg, rgba(0, 0, 0, 0.6), transparent);
           width: 100%;
           height: 100%;
-          position: absolute;
           z-index: 1;
           display: flex;
           justify-content: space-between;
           align-items: end;
           gap: 10px;
           .item-description {
-          padding: var(--item-pad);
+            padding: var(--item-pad);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -135,14 +135,16 @@ html {
             font-weight: 600;
             font-size: var(--font-small);
             .item-price {
-              font-family: 'Sono', sans-serif;
+              font-family: "Sono", sans-serif;
+              font-size: var(--font-med);
             }
             .item-name {
-              font-family: 'DM Serif Text', serif;
+              font-family: "DM Serif Text", serif;
+              font-size: var(--font-med);
             }
           }
           .add-to-cart {
-          padding: var(--item-pad);
+            padding: var(--item-pad);
             flex: 1;
             display: flex;
             justify-content: center;
@@ -190,8 +192,75 @@ html {
       }
     }
   }
-}
+  .explore-section {
+    padding: 3rem 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
+    .explore-content {
+      text-align: center;
+      max-width: 600px;
+
+      .explore-title {
+        font-family: "DM Serif Text", serif;
+        font-size: var(--font-large);
+        font-weight: 600;
+        color: var(--color-light);
+        margin-bottom: 1rem;
+        line-height: 1.2;
+      }
+
+      .explore-description {
+        font-size: var(--font-small);
+        color: var(--color-light);
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        line-height: 1.5;
+      }
+
+      .explore-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--color-primary);
+        color: var(--color-light);
+        border: none;
+        padding: 1.2rem 2.5rem;
+        font-size: var(--font-small);
+        font-weight: 600;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 127, 17, 0.3);
+
+        &:hover {
+          background: var(--color-secondary);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(255, 127, 17, 0.4);
+        }
+
+        &:active {
+          transform: translateY(0);
+          box-shadow: 0 2px 10px rgba(255, 127, 17, 0.3);
+        }
+
+        .button-text {
+          letter-spacing: 0.5px;
+        }
+
+        .arrow-icon {
+          font-size: 2rem;
+          transition: transform 0.3s ease;
+        }
+
+        &:hover .arrow-icon {
+          transform: translateX(4px);
+        }
+      }
+    }
+  }
+}
 
 @keyframes slide-in {
   0% {

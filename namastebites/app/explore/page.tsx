@@ -1,119 +1,182 @@
-'use client';
-import Items from "../components/Items/items"
+"use client";
+import Items from "../components/Items/items";
 import { FilterType, Food } from "../types/types";
-import "./explore.css"
+import "./explore.css";
 import { useCart } from "../store/useCart";
 import { useEffect, useState } from "react";
 import PriceFooter from "../components/priceFooter/priceFooter";
 import { useRouter } from "next/navigation";
 import { getItems } from "../functions/api/explore/explore";
+import { SortType } from "../types/types";
 import Filter from "../components/Filter/Filter";
 const Explore = () => {
   const router = useRouter();
   const [items, setItems] = useState<Food[]>([]);
   const [filterShown, setFilterShown] = useState(false);
-  const [filters, setFilters] = useState<FilterType>([]);
-  useEffect(() => {
-    getItems()
-    .then(res => {
-      console.log(res);
+  const [filters, setFilters] = useState<FilterType[]>([]);
+  const [sorting, setSorting] = useState<SortType | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const explore = () =>
+    getItems().then((res) => {
       if (res.status !== 200) {
-        console.error('Failed to fetch items');
+        console.error("Failed to fetch items");
         return;
       }
-      res.data?.items?.map(item => {
-        setItems(prev => [...prev, {
-          id: item.item_id.toString(),
-          name: item.name,
-          price: Number(item.price),
-          url: item.image_url,
-          quantity: 0,
-        }])
+      res.data?.items?.map((item) => {
+        setItems((prev) => [
+          ...prev,
+          {
+            id: item.item_id.toString(),
+            name: item.name,
+            price: Number(item.price),
+            url: item.image_url,
+            quantity: 0,
+          },
+        ]);
       });
-      console.log('items: ', items);
-    })
-    return (() => setItems([]))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  const cart = useCart(s => s.cart);
-  const addToCart = useCart(s => s.addToCart);
-  const decreaseQuantity = useCart(s => s.decreaseQuantity);
+      console.log("items: ", items);
+    });
   useEffect(() => {
-    console.log('cart: ', cart);
+    explore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const cart = useCart((s) => s.cart);
+  const addToCart = useCart((s) => s.addToCart);
+  const decreaseQuantity = useCart((s) => s.decreaseQuantity);
+  useEffect(() => {
+    console.log("cart: ", cart);
   }, [cart]);
   const addButton = (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    addToCart(items.find(t => t.id === id)!);
-  }
+    addToCart(items.find((t) => t.id === id)!);
+  };
   const removeButton = (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     decreaseQuantity(id);
-  }
+  };
   const goToItem = (id: string) => {
     router.push(`/item/${id}`);
-  }
-  const handleFilter = () => {
-
-  }
+  };
+  const applySearch = async () => {
+    const response = await getItems({
+      globalSearch: searchTerm,
+      filter: filters,
+      sorting,
+    });
+    if (response.status !== 200) {
+      console.error("Failed to fetch items");
+      return;
+    }
+    const newItem: Food[] = [];
+    response.data?.items?.map((item) => {
+      newItem.push({
+        id: item.item_id.toString(),
+        name: item.name,
+        price: Number(item.price),
+        url: item.image_url || "",
+        quantity: 0,
+      });
+    });
+    setItems(newItem);
+  };
   return (
     <div className="explore-container">
-      {filterShown && <Filter setFilterShown={setFilterShown} setFilters={setFilters}/>}
+      {filterShown && (
+        <Filter
+          applyFilter={applySearch}
+          applySearch={explore}
+          filteredList={filters}
+          setSorting={setSorting}
+          sorting={sorting}
+          setFilterShown={setFilterShown}
+          setFilters={setFilters}
+        />
+      )}
       <div className="explore">
         <div className="explore-header">
           <h1 className="explore-text">Explore</h1>
         </div>
-        <div className="explore-search">
-          <input type="text" placeholder="Search" />
-          <button
-          className="filter-button"
-          onClick={() => setFilterShown(!filterShown)}
-          >
-            <span className="material-symbols-outlined">
-              page_info
-            </span>
+        <form
+          className="explore-search"
+          onSubmit={(e) => {
+            e.preventDefault();
+            applySearch();
+          }}
+        >
+          <input
+            type="text"
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search"
+          />
+          <button>
+            <span className="material-symbols-outlined">search</span>
           </button>
-        </div>
+          <button
+            className="filter-button"
+            onClick={() => setFilterShown(!filterShown)}
+          >
+            <span className="material-symbols-outlined">page_info</span>
+          </button>
+        </form>
         <div className="explore-body">
-          <Items items={items} Component={({ item }) => {
-            return (
-              <div style={{ backgroundImage: `url(${item.url})` }} className="item-container"
-                onClick={() => goToItem(item.id)}
-                key={item.id}
-              >
-                <div className="item-description-container">
-                  {[0, undefined, -1].includes(cart.find(t => t.id === item.id)?.quantity) ? (
-                    <>
-                      <div className="item-description">
-                        <div className="item-name">{item.name}</div>
-                        <div className="item-price">₹{item.price}</div>
-                      </div>
-                      <div className="add-to-cart">
-                        <button className="item-button"
+          <Items
+            items={items}
+            Component={({ item }) => {
+              return (
+                <div
+                  style={{ backgroundImage: `url(${item.url})` }}
+                  className="item-container"
+                  onClick={() => goToItem(item.id)}
+                  key={item.id}
+                >
+                  <div className="item-description-container">
+                    {[0, undefined, -1].includes(
+                      cart.find((t) => t.id === item.id)?.quantity,
+                    ) ? (
+                      <>
+                        <div className="item-description">
+                          <div className="item-name">{item.name}</div>
+                          <div className="item-price">₹{item.price}</div>
+                        </div>
+                        <div className="add-to-cart">
+                          <button
+                            className="item-button"
+                            onClick={(e) => addButton(item.id, e)}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="selected-item-description-container">
+                        <button
+                          className="item-button"
+                          onClick={(e) => removeButton(item.id, e)}
+                        >
+                          -
+                        </button>
+                        <div className="quantity">
+                          {cart.find((t) => t.id === item.id)?.quantity || 1}
+                        </div>
+                        <button
+                          className="item-button"
                           onClick={(e) => addButton(item.id, e)}
-                        >+</button>
+                        >
+                          +
+                        </button>
                       </div>
-                    </>
-                  ) : (
-                    <div className="selected-item-description-container">
-                      <button className="item-button"
-                        onClick={(e) => removeButton(item.id, e)}
-                      >-</button>
-                      <div className="quantity">{cart.find(t => t.id === item.id)?.quantity || 1}</div>
-                      <button className="item-button"
-                        onClick={(e) => addButton(item.id, e)}
-                      >+</button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
-
-              </div>
-            )
-          }} />
+              );
+            }}
+          />
         </div>
       </div>
       <PriceFooter />
     </div>
-  )
-}
+  );
+};
 
 export default Explore;
