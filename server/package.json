@@ -7,10 +7,14 @@
     "start": "./server"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.1",
     "elysia": "latest",
-    "pg": "^8.18.0"
+    "pg": "^8.18.0",
+    "razorpay": "^2.9.6",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/pg": "^8.16.0",
     "bun-types": "latest"
   },
   "module": "src/index.js"

@@ -20,9 +20,11 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@api/*": ["./app/api/*"],
       "@styles/*": ["./app/styles/*"],
-      "@store/*": ["./app/store/*"]
+      "@store/*": ["./app/store/*"],
+      "@functions/*": ["./app/functions/internals/*"],
+      "@types/*": ["./app/types/*"],
+      "@api/*": ["./app/functions/api/*"]
     }
   },
   "include": [
