@@ -49,5 +49,10 @@ export type ResponseType<T> = {
 export type FilterType = {
   id: string;
   value: string | Date[] | number[] | string[] | number;
-  type: "multi-select" | "global-search" | "date" | "range";
-}[];
+  type: "multi-select" | "global-search" | "date" | "range" | "single-select";
+};
+
+export type SortType = {
+  id: string;
+  desc: boolean;
+};

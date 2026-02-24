@@ -36,7 +36,7 @@
         font-family: "JetBrains Mono", "sans serif";
         font-weight: 600;
       }
-      .filter-button {
+      > button {
         height: 100%;
         padding: 0.5rem 1rem;
         border-radius: 25px;
@@ -107,9 +107,11 @@
             font-size: var(--font-small);
             .item-price {
               font-family: "Sono", sans-serif;
+              font-size: var(--font-med);
             }
             .item-name {
               font-family: "DM Serif Text", serif;
+              font-size: var(--font-med);
             }
           }
           .add-to-cart {

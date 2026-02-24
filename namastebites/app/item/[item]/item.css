@@ -13,7 +13,7 @@
     gap: 1rem;
     .body-1 {
       flex: 1;
-      min-width: 400px;
+      min-width: 350px;
       display: flex;
       flex-direction: column;
       .thumbnail {
@@ -45,7 +45,7 @@
     }
     .body-2 {
       flex: 1;
-      min-width: 400px;
+      min-width: 350px;
       background: var(--color-dark);
       border-radius: 30px;
       display: flex;
