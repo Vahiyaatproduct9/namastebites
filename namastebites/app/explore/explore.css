@@ -22,16 +22,38 @@
     .explore-search {
       width: 100%;
       max-width: 500px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       input {
         width: 100%;
         padding: 0.5rem 2rem;
         border-radius: 25px;
         border: none;
-        background: rgba(100,100,100,0.5);
+        background: rgba(100, 100, 100, 0.5);
         outline: none;
         font-size: var(--font-med);
-        font-family: 'JetBrains Mono', 'sans serif';
+        font-family: "JetBrains Mono", "sans serif";
         font-weight: 600;
+      }
+      > button {
+        height: 100%;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        border: none;
+        background: rgba(100, 100, 100, 0.5);
+        outline: none;
+        font-size: var(--font-med);
+        font-family: "JetBrains Mono", "sans serif";
+        font-weight: 600;
+        cursor: pointer;
+        margin-left: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .material-symbols-outlined {
+          font-size: 24px;
+        }
       }
     }
     .explore-body {
@@ -43,7 +65,7 @@
       align-items: center;
       .item-container {
         width: 100%;
-        height: 200px;
+        height: 300px;
         border-radius: 10px;
         display: flex;
         align-items: center;
@@ -59,12 +81,12 @@
         background-clip: border-box;
         transition-duration: 500ms;
         &:active {
-          transform: scale(0.98)
+          transform: scale(0.98);
         }
         .item-description-container {
           --item-pad: 1rem;
           --item-radius: 25px;
-          background: linear-gradient(0deg, rgba(0,0,0,0.6), transparent);
+          background: linear-gradient(0deg, rgba(0, 0, 0, 0.6), transparent);
           width: 100%;
           height: 100%;
           z-index: 1;
@@ -73,7 +95,7 @@
           align-items: end;
           gap: 10px;
           .item-description {
-          padding: var(--item-pad);
+            padding: var(--item-pad);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -84,14 +106,16 @@
             font-weight: 600;
             font-size: var(--font-small);
             .item-price {
-              font-family: 'Sono', sans-serif;
+              font-family: "Sono", sans-serif;
+              font-size: var(--font-med);
             }
             .item-name {
-              font-family: 'DM Serif Text', serif;
+              font-family: "DM Serif Text", serif;
+              font-size: var(--font-med);
             }
           }
           .add-to-cart {
-          padding: var(--item-pad);
+            padding: var(--item-pad);
             flex: 1;
             display: flex;
             justify-content: center;
