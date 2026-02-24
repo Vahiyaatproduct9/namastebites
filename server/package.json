@@ -2,8 +2,9 @@
   "name": "server",
   "version": "1.0.50",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build --compile --minify --target bun src/index.ts --outfile server",
+    "start": "./server"
   },
   "dependencies": {
     "elysia": "latest",
