@@ -28,7 +28,7 @@ export type Food = Item & {
   quantity: number;
 };
 
-export type CartItem = Omit<Item, "url" | "price" | "name"> & {
+export type CartItem = Omit<Item, "url"> & {
   quantity: number;
 };
 

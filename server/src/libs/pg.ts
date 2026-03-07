@@ -6,7 +6,7 @@ export const client = new Client({
   host: process.env.POSTGRES_HOST,
   port: Number(process.env.POSTGRES_PORT),
   database: process.env.POSTGRES_DB,
-  ssl: true
+  ssl: true,
 });
 
 export const pool = new Pool({
@@ -15,5 +15,6 @@ export const pool = new Pool({
   host: process.env.POSTGRES_HOST,
   port: Number(process.env.POSTGRES_PORT),
   database: process.env.POSTGRES_DB,
-  ssl: true
+  ssl: true,
 });
+
