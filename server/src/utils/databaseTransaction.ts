@@ -1,5 +1,4 @@
 import { DB } from "@/class/Database";
-import { Context } from "elysia";
 import { Pool, PoolClient } from "pg";
 
 // Transaction controller that makes sure the database 'ROLLBACK''s in case of ERROR

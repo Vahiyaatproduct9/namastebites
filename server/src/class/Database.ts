@@ -4,10 +4,11 @@ import { Pool, Client } from "pg";
 class DBClass {
   client: Client = client;
   pool: Pool = pool;
-  // constructor() {
-  //   this.pool = pool;
-  //   this.client = client;
-  // }
+  constructor() {
+    pool.on("error", (err) => {
+      console.error("Error in pool: ", err);
+    });
+  }
 }
 
 const DB = new DBClass();

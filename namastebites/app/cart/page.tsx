@@ -23,8 +23,41 @@ const Cart = () => {
 
   const checkout = async () => {
     const data: CartItem[] = cart;
-    const result = await Order.initiatePayment(data);
-    console.log("result: ", result);
+    const { order } = await Order.initiatePayment(data);
+    if (!order) {
+      console.log("no order found!");
+      return;
+    }
+    const options = {
+      key: process.env.RZP_KEY,
+      amount: order.amount,
+      currency: "INR",
+      description: "Namaste Bites",
+      image: "http://picsum.photos/400/400",
+      order_id: order.id,
+      handler: (res: any) => {
+        console.log("response: ", res);
+      },
+      prefill: {
+        name: "Kishor",
+        email: "kishordebnath123123@gmail.com",
+        phone: "+918759814731",
+      },
+      notes: {
+        info1: "This is a note!",
+      },
+      theme: {
+        color: "#CCC",
+      },
+      retry: {
+        max_count: 3,
+      },
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", (res) => {
+      console.log("payment failed!", res);
+    });
+    rzp.open();
   };
 
   return (
