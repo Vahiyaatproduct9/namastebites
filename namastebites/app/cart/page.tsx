@@ -23,9 +23,8 @@ const Cart = () => {
 
   const checkout = async () => {
     const data: CartItem[] = cart;
-    const newOrder = new Order(data);
-    const response = await newOrder.initiatePayment();
-    console.log("response:", response);
+    const result = await Order.initiatePayment(data);
+    console.log("result: ", result);
   };
 
   return (

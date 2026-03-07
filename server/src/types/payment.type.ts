@@ -8,6 +8,17 @@ const paymentOrderSchema = z.object({
   ),
 });
 
+const createOrderSchema = z.object({
+  items: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      price: z.number(),
+      quantity: z.number(),
+    }),
+  ),
+});
+
 const exploreType = [
   "single-select",
   "multi-select",
@@ -42,4 +53,4 @@ const exploreRequestBody = z.union([
   }),
   z.undefined(),
 ]);
-export { paymentOrderSchema, exploreRequestBody };
+export { paymentOrderSchema, exploreRequestBody, createOrderSchema };
