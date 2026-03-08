@@ -8,6 +8,11 @@ export type JsonResponse = {
   message: string;
   provider: "Namaste Bites :)";
 };
+export type RazorPayVerify = {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+};
 export type Item = {
   id: string;
   name: string;

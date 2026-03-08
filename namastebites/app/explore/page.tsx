@@ -17,12 +17,8 @@ const Explore = () => {
   const [sorting, setSorting] = useState<SortType | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const explore = () =>
-    getItems().then((res) => {
-      if (res.status !== 200) {
-        console.error("Failed to fetch items");
-        return;
-      }
-      res.data?.items?.map((item) => {
+    getItems().then((data) => {
+      data?.items?.map((item) => {
         setItems((prev) => [
           ...prev,
           {
@@ -59,17 +55,13 @@ const Explore = () => {
     router.push(`/item/${id}`);
   };
   const applySearch = async () => {
-    const response = await getItems({
+    const data = await getItems({
       globalSearch: searchTerm,
       filter: filters,
       sorting,
     });
-    if (response.status !== 200) {
-      console.error("Failed to fetch items");
-      return;
-    }
     const newItem: Food[] = [];
-    response.data?.items?.map((item) => {
+    data?.items?.map((item) => {
       newItem.push({
         id: item.item_id.toString(),
         name: item.name,
@@ -132,7 +124,7 @@ const Explore = () => {
                 >
                   <div className="item-description-container">
                     {[0, undefined, -1].includes(
-                      cart.find((t) => t.id === item.id)?.quantity,
+                      cart.find((t) => t.id === item.id)?.quantity
                     ) ? (
                       <>
                         <div className="item-description">

@@ -8,7 +8,9 @@ const RZP_SECRET = process.env.RZP_SECRET || "";
 const createOrderService =
   (ctx: Context) => async (client: PoolClient, pool: Pool) => {
     console.log("body: ", ctx.body);
-    const { items } = createOrderSchema.parse(ctx.body);
+    const { items, user_id, special_instructions } = createOrderSchema.parse(
+      ctx.body,
+    );
     const item_ids = items.map((item) => item.id);
     // Fetching from Database instead of using client data to make sure the data is safe
     const itemInfo = (
@@ -32,12 +34,53 @@ const createOrderService =
     console.log("total_amount:", amount);
 
     // const createOrder = (
-    //   await client.query(`
-    //     INSERT INTO transactions()
-    //     VALUES()
-    //   `)
+    //   await client.query(
+    //     `
+    //     WITH t AS (
+    //       INSERT INTO transactions
+    //       (
+    //         razorpay_transaction_id,
+    //         payment_method,
+    //         status,
+    //         amount_paid
+    //       )
+    //       VALUES (
+    //         $1, 'online'::paymentmethod,
+    //         'completed'::transactionstatus,
+    //         $2
+    //       )
+    //       RETURNING *
+    //     ),
+    //     o AS (
+    //       INSERT INTO orders
+    //         (user_id,
+    //         transaction_id,
+    //         location_id,
+    //         total_price,
+    //         status,
+    //         special_instructions)
+    //       SELECT $3, t.id, NULL, $4, 'pending'::orderstatus, $5
+    //       FROM t
+    //       RETURNING *
+    //     )
+    //     SELECT TO_JSONB(t) as transactions,
+    //     TO_JSONB(o) AS orders
+    //     FROM t
+    //     JOIN o ON TRUE;
+    //   `,
+    //     [user_id, amount, special_instructions || null],
+    //   )
     // ).rows[0];
-
+    const createOrder = (
+      await pool.query(
+        `
+        INSERT INTO orders (user_id, location_id, total_price, status, special_instructions)
+      VALUES ($1, NULL, $2, 'pending'::orderstatus, $3)
+      `,
+        [user_id, amount, special_instructions || null],
+      )
+    ).rows[0];
+    console.log("insertion: ", createOrder);
     const order = await razorpay.orders.create({
       // Multiplying by 100 to convert to Rupees
       amount: amount * 100,
