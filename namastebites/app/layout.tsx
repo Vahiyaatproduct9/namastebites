@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import "./home.css";
+import Navbar from "@/app/navbar";
+import { dark } from "@clerk/ui/themes";
+import Notification from "@/app/components/popup/notifiication";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -43,10 +47,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <section className="navbar">
-          <div className="px-2 py-1">Namaste Bites</div>
-        </section>
-        {children}
+        <ClerkProvider
+          appearance={{
+            theme: dark,
+            userButton: dark,
+          }}
+        >
+          <Notification />
+          <Navbar />
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );

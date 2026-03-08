@@ -1,4 +1,5 @@
 import * as z from "zod";
+
 const paymentOrderSchema = z.object({
   amount: z.number(),
   notes: z.optional(
@@ -17,6 +18,8 @@ const createOrderSchema = z.object({
       quantity: z.number(),
     }),
   ),
+  user_id: z.string(),
+  special_instructions: z.optional(z.string()),
 });
 
 const verifyOrderSchema = z.object({
@@ -65,4 +68,5 @@ export {
   exploreRequestBody,
   createOrderSchema,
   verifyOrderSchema,
+  createUserSchema,
 };

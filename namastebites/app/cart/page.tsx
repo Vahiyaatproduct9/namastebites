@@ -1,18 +1,22 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./cart.css";
 import { useRouter } from "next/navigation";
 import { useCart } from "@store/useCart";
 import Script from "next/script";
-import { CartItem, Food } from "../types/types";
+import { CartItem, Food, RazorPayVerify } from "../types/types";
 import Order from "@api/payment/orders";
+import useMessage from "../store/useMessage";
+import { useUser } from "@clerk/nextjs";
 const Cart = () => {
+  const { user } = useUser();
   const router = useRouter();
+  const setMessage = useMessage((s) => s.setMessage);
   const cart = useCart((s) => s.cart);
   const getTotalPrice = useCart((s) => s.getTotalPrice);
+  const [instruction, setInstruction] = useState<string>("");
   const [totalPrice, setTotalPrice] = React.useState<number>(0);
-
   useEffect(() => {
     const total = getTotalPrice();
     setTotalPrice(total);
@@ -21,16 +25,18 @@ const Cart = () => {
   const goToExplore = () => {
     router.push("/explore");
   };
-
   const checkout = async () => {
     const data: CartItem[] = cart;
-    const { order } = await Order.initiatePayment(data);
+    const { order } = await Order.initiatePayment({
+      data,
+      instruction,
+      user_id: user?.id || "",
+    });
     if (!order) {
       console.log("no order found!");
       return;
     }
     const RZP_KEY = process.env.NEXT_PUBLIC_RZP_KEY;
-    console.log("RZP_KEY: ", RZP_KEY);
     const options = {
       key: RZP_KEY,
       amount: order.amount,
@@ -38,10 +44,10 @@ const Cart = () => {
       description: "Namaste Bites",
       image: "http://picsum.photos/400/400",
       order_id: order.id,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handler: (res: any) => {
+      handler: async (res: RazorPayVerify) => {
         console.log("response: ", res);
-        Order.verifyPayment(res);
+        await Order.verifyPayment(res);
+        router.push("/explore");
       },
       prefill: {
         name: "Kishor",
@@ -62,6 +68,7 @@ const Cart = () => {
     rzp.open();
     rzp.on("payment.failed", (res: Error) => {
       console.log("payment failed!", res);
+      setMessage("Payment failed!");
     });
   };
 
@@ -122,7 +129,11 @@ const Cart = () => {
               </div>
               <div className="checkout-final">
                 <div className="special-instructions">
-                  <textarea placeholder="Add any special instructions for your order..."></textarea>
+                  <textarea
+                    value={instruction}
+                    onChange={(e) => setInstruction(e.target.value)}
+                    placeholder="Add any special instructions for your order..."
+                  />
                 </div>
                 <p>Delivery charges will be calculated at checkout</p>
                 <div className="checkout-total">
@@ -159,7 +170,7 @@ const CartBody = (props: {
   const decreaseQuantity = useCart((s) => s.decreaseQuantity);
   const incrementItem = (
     id: string,
-    e: React.MouseEvent<HTMLButtonElement>,
+    e: React.MouseEvent<HTMLButtonElement>
   ) => {
     const item = props.cart.find((t) => t.id === id)!;
     e.stopPropagation();
@@ -167,7 +178,7 @@ const CartBody = (props: {
   };
   const decrementItem = (
     id: string,
-    e: React.MouseEvent<HTMLButtonElement>,
+    e: React.MouseEvent<HTMLButtonElement>
   ) => {
     e.stopPropagation();
     decreaseQuantity(id);
