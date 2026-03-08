@@ -1,8 +1,10 @@
-import { createOrderSchema } from "@/types/payment.type";
+import { createHmac } from "crypto";
+import { createOrderSchema, verifyOrderSchema } from "@/types/payment.type";
 import razorpay from "@libs/razorpay";
-import { Context } from "elysia";
+import { Context, status } from "elysia";
 import { PoolClient, Pool } from "pg";
 
+const RZP_SECRET = process.env.RZP_SECRET || "";
 const createOrderService =
   (ctx: Context) => async (client: PoolClient, pool: Pool) => {
     console.log("body: ", ctx.body);
@@ -28,12 +30,14 @@ const createOrderService =
       amount += Number(item_price) * item_quantity;
     }
     console.log("total_amount:", amount);
+
     // const createOrder = (
     //   await client.query(`
     //     INSERT INTO transactions()
     //     VALUES()
     //   `)
     // ).rows[0];
+
     const order = await razorpay.orders.create({
       // Multiplying by 100 to convert to Rupees
       amount: amount * 100,
@@ -43,6 +47,7 @@ const createOrderService =
         message: "Order initiated!",
       },
     });
+
     console.log("order:", order);
     return {
       status: 200,
@@ -51,11 +56,40 @@ const createOrderService =
     };
   };
 
-const verifyPayment =
-  (ctx: Context) => async (client: PoolClient, Pool: Pool) => {};
+const verifyPaymentService = async (ctx: Context) => {
+  console.log("body: ", ctx.body);
+  const {
+    user_id,
+    razorpay_signature,
+    razorpay_order_id,
+    razorpay_payment_id,
+  } = verifyOrderSchema.parse(ctx.body);
+
+  await Bun.write("./verifypayment.json", JSON.stringify(ctx.body)).then(
+    (res) => console.log("Done!", res),
+  );
+  const local_generated_signature = createHmac("sha256", RZP_SECRET)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    .digest("hex");
+
+  // Verifying the signature
+  if (razorpay_signature === local_generated_signature) {
+    console.log("Payment Verified");
+    return {
+      message: "Signature verified successfully",
+      status: 201,
+    };
+  }
+
+  return {
+    status: 401,
+    message: "Signature verification failed",
+  };
+};
 
 const functions = {
   createOrderService,
+  verifyPaymentService,
 };
 
 export default functions;

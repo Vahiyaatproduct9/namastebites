@@ -19,6 +19,13 @@ const createOrderSchema = z.object({
   ),
 });
 
+const verifyOrderSchema = z.object({
+  user_id: z.string(),
+  razorpay_payment_id: z.string(),
+  razorpay_order_id: z.string(),
+  razorpay_signature: z.string(),
+});
+
 const exploreType = [
   "single-select",
   "multi-select",
@@ -53,4 +60,9 @@ const exploreRequestBody = z.union([
   }),
   z.undefined(),
 ]);
-export { paymentOrderSchema, exploreRequestBody, createOrderSchema };
+export {
+  paymentOrderSchema,
+  exploreRequestBody,
+  createOrderSchema,
+  verifyOrderSchema,
+};

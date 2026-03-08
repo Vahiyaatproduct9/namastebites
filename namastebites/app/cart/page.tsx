@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import "./cart.css";
 import { useRouter } from "next/navigation";
 import { useCart } from "@store/useCart";
+import Script from "next/script";
 import { CartItem, Food } from "../types/types";
 import Order from "@api/payment/orders";
 const Cart = () => {
@@ -28,15 +29,19 @@ const Cart = () => {
       console.log("no order found!");
       return;
     }
+    const RZP_KEY = process.env.NEXT_PUBLIC_RZP_KEY;
+    console.log("RZP_KEY: ", RZP_KEY);
     const options = {
-      key: process.env.RZP_KEY,
+      key: RZP_KEY,
       amount: order.amount,
       currency: "INR",
       description: "Namaste Bites",
       image: "http://picsum.photos/400/400",
       order_id: order.id,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       handler: (res: any) => {
         console.log("response: ", res);
+        Order.verifyPayment(res);
       },
       prefill: {
         name: "Kishor",
@@ -54,14 +59,19 @@ const Cart = () => {
       },
     };
     const rzp = new window.Razorpay(options);
-    rzp.on("payment.failed", (res) => {
+    rzp.open();
+    rzp.on("payment.failed", (res: Error) => {
       console.log("payment failed!", res);
     });
-    rzp.open();
   };
 
   return (
     <div className="cart">
+      <Script
+        id="razorpay"
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        onLoad={() => console.log("Script Loaded!")}
+      />
       <div className="cart-head">
         <h1 className="text-2xl font-bold">Cart</h1>
       </div>
