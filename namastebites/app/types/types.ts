@@ -1,5 +1,13 @@
 import Item from "../item/[item]/page";
 
+export type JsonResponse = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
+  status: number;
+  success: boolean;
+  message: string;
+  provider: "Namaste Bites :)";
+};
 export type Item = {
   id: string;
   name: string;
