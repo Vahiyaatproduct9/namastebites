@@ -6,7 +6,7 @@ async function createOrder(ctx: Context) {
 }
 
 async function verifyOrder(ctx: Context) {
-  return await payment.verifyPaymentService(ctx);
+  return await DBTransaction(payment.verifyPaymentService(ctx));
 }
 
 export default {

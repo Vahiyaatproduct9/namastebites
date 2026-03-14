@@ -1,17 +1,15 @@
-import { writeFile } from "fs/promises";
 import {
   createOrUpdateUserSchema,
   deleteUserSchema,
 } from "@/types/global.type";
-import { Context } from "elysia";
 import { PoolClient } from "pg";
 import z from "zod";
-const userService = (ctx: Context) => async (client: PoolClient) => {
-  await writeFile(
-    "data/create-user-info.json",
-    JSON.stringify(ctx.body, null, 2),
-  ).then((res) => console.log("Done!", res));
-  const { type } = ctx.body as any;
+
+const userService = (event: any) => async (client: PoolClient) => {
+  Bun.write("data/create-user-info.json", JSON.stringify(event, null, 2)).then(
+    () => console.log("Done!")
+  );
+  const { type } = event;
   z.enum(["user.created", "user.updated", "user.deleted"]).parse(type);
   if (type === "user.created") {
     const {
@@ -20,7 +18,7 @@ const userService = (ctx: Context) => async (client: PoolClient) => {
       object,
       instance_id,
       timestamp,
-    } = createOrUpdateUserSchema.parse(ctx.body);
+    } = createOrUpdateUserSchema.parse(event);
     const name = `${first_name} ${last_name}`;
     const email = email_addresses[0]?.email_address || null;
     if (type === "user.created") {
@@ -29,7 +27,7 @@ const userService = (ctx: Context) => async (client: PoolClient) => {
           `
       SELECT 1 FROM USERS WHERE CLERK_ID = $1
     `,
-          [id],
+          [id]
         )
       ).rows[0];
       if (userExsists) {
@@ -41,19 +39,21 @@ const userService = (ctx: Context) => async (client: PoolClient) => {
       const createUser = (
         await client.query(
           `
-        INSERT INTO users (clerk_id, email, name)
+        INSERT INTO users(clerk_id, email, name)
         VALUES ($1, $2, $3)
         RETURNING user_id, email, name
         `,
-          [id, email, name],
+          [id, email, name]
         )
       ).rows[0];
     }
   } else if (type === "user.updated") {
     const {
       data: { email_addresses, id, first_name, last_name },
-    } = createOrUpdateUserSchema.parse(ctx.body);
-    const name = `${first_name} ${last_name}`;
+    } = createOrUpdateUserSchema.parse(event);
+    const name = [first_name, last_name]
+      .filter((name) => (typeof name === "string" || name !== "" ? name : ""))
+      .join(" ");
     const email = email_addresses[0]?.email_address || null;
     const updateUser = await client.query(
       `
@@ -64,35 +64,31 @@ const userService = (ctx: Context) => async (client: PoolClient) => {
         WHERE clerk_id = $1
         RETURNING user_id, email, name
       `,
-      [id, email, name],
+      [id, email, name]
     );
   } else if (type === "user.deleted") {
     const {
       data: { id },
-    } = deleteUserSchema.parse(ctx.body);
+    } = deleteUserSchema.parse(event);
     await client.query(
       `
         DELETE FROM users
         WHERE clerk_id = $1
         RETURNING user_id, email, name
       `,
-      [id],
+      [id]
     );
   }
   const verb =
     type === "user.created"
       ? "created"
       : type === "user.updated"
-        ? "updated"
-        : "deleted";
+      ? "updated"
+      : "deleted";
   return {
     message: `User ${verb} successfully`,
     status: type === "user.created" ? 201 : 200,
   };
 };
-
-// const updateUserService => (ctx: Context) => async (client: PoolClient) => {
-//   // uclient hfiuh slejoir
-// }
 
 export default userService;

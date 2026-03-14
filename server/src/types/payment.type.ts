@@ -5,7 +5,7 @@ const paymentOrderSchema = z.object({
   notes: z.optional(
     z.object({
       message: z.string(),
-    }),
+    })
   ),
 });
 
@@ -16,14 +16,14 @@ const createOrderSchema = z.object({
       name: z.string(),
       price: z.number(),
       quantity: z.number(),
-    }),
+    })
   ),
   user_id: z.string(),
   special_instructions: z.optional(z.string()),
 });
 
 const verifyOrderSchema = z.object({
-  user_id: z.string(),
+  user_id: z.union([z.string(), z.null()]),
   razorpay_payment_id: z.string(),
   razorpay_order_id: z.string(),
   razorpay_signature: z.string(),
@@ -46,7 +46,7 @@ const exploreRequestBody = z.union([
           id: z.string(),
           value: z.union([z.string(), z.array(z.string())]),
           type: z.enum(exploreType),
-        }),
+        })
       )
       .optional(),
     sorting: z.union([
@@ -68,5 +68,4 @@ export {
   exploreRequestBody,
   createOrderSchema,
   verifyOrderSchema,
-  createUserSchema,
 };
