@@ -17,6 +17,7 @@ const Cart = () => {
   const getTotalPrice = useCart((s) => s.getTotalPrice);
   const [instruction, setInstruction] = useState<string>("");
   const [totalPrice, setTotalPrice] = React.useState<number>(0);
+  const [paymentMode, setPaymentMode] = useState<"online" | "cod">("online");
   useEffect(() => {
     const total = getTotalPrice();
     setTotalPrice(total);
@@ -27,7 +28,7 @@ const Cart = () => {
   };
   const checkout = async () => {
     const data: CartItem[] = cart;
-    const { order } = await Order.initiatePayment({
+    const { order } = await Order.initiatePaymentOnline({
       data,
       instruction,
       user_id: user?.id || "",
@@ -46,16 +47,20 @@ const Cart = () => {
       order_id: order.id,
       handler: async (res: RazorPayVerify) => {
         console.log("response: ", res);
-        await Order.verifyPayment(res);
+        const data = {
+          ...res,
+          user_id: user?.id || null,
+        };
+        await Order.verifyPayment(data);
         router.push("/explore");
       },
       prefill: {
-        name: "Kishor",
-        email: "kishordebnath123123@gmail.com",
-        phone: "+918759814731",
+        name: "Grishma",
+        email: "grishmadev@proton.me",
+        phone: "+911234567890",
       },
       notes: {
-        info1: "This is a note!",
+        info1: instruction,
       },
       theme: {
         color: "#CCC",
@@ -71,7 +76,9 @@ const Cart = () => {
       setMessage("Payment failed!");
     });
   };
-
+  useEffect(() => {
+    console.log("instruction updated!", instruction);
+  }, [instruction]);
   return (
     <div className="cart">
       <Script
@@ -128,6 +135,45 @@ const Cart = () => {
                 </div>
               </div>
               <div className="checkout-final">
+                <div className="payment-mode-selection">
+                  <h3>Payment Method</h3>
+                  <div className="payment-mode-options">
+                    <label
+                      className={`payment-mode-option ${paymentMode === "online" ? "active" : ""}`}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMode"
+                        value="online"
+                        checked={paymentMode === "online"}
+                        onChange={(e) =>
+                          setPaymentMode(e.target.value as "online" | "cod")
+                        }
+                      />
+                      <span className="mode-label">
+                        <span className="mode-icon">💳</span>
+                        <span className="mode-text">Online Payment</span>
+                      </span>
+                    </label>
+                    <label
+                      className={`payment-mode-option ${paymentMode === "cod" ? "active" : ""}`}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMode"
+                        value="cod"
+                        checked={paymentMode === "cod"}
+                        onChange={(e) =>
+                          setPaymentMode(e.target.value as "online" | "cod")
+                        }
+                      />
+                      <span className="mode-label">
+                        <span className="mode-icon">💵</span>
+                        <span className="mode-text">Cash on Delivery</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
                 <div className="special-instructions">
                   <textarea
                     value={instruction}
@@ -170,7 +216,7 @@ const CartBody = (props: {
   const decreaseQuantity = useCart((s) => s.decreaseQuantity);
   const incrementItem = (
     id: string,
-    e: React.MouseEvent<HTMLButtonElement>
+    e: React.MouseEvent<HTMLButtonElement>,
   ) => {
     const item = props.cart.find((t) => t.id === id)!;
     e.stopPropagation();
@@ -178,7 +224,7 @@ const CartBody = (props: {
   };
   const decrementItem = (
     id: string,
-    e: React.MouseEvent<HTMLButtonElement>
+    e: React.MouseEvent<HTMLButtonElement>,
   ) => {
     e.stopPropagation();
     decreaseQuantity(id);
