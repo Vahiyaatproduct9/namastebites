@@ -1,3 +1,4 @@
+import "@utils/patchStack";
 import { Elysia } from "elysia";
 const port = process.env.PORT || 8000;
 import exploreRouter from "@router/explore.router";
@@ -5,6 +6,8 @@ import paymentRouter from "@router/payment.router";
 import cors from "@elysiajs/cors";
 import { ZodError } from "zod";
 import { DatabaseError } from "pg";
+import userRouter from "@router/user.router";
+import { clerkWebhook } from "./webhooks/clerk";
 const app = new Elysia()
   .onRequest((ctx) => {
     console.log("ctx body:", JSON.stringify(ctx.request.body, null, 2));
@@ -12,8 +15,8 @@ const app = new Elysia()
   })
   .onError((err) => {
     const error = err.error;
-    console.error("You have an error: ", error);
     if (error instanceof ZodError) {
+      console.error("Zod Error: ", error);
       err.set.status = 400;
       return {
         status: 400,
@@ -21,11 +24,13 @@ const app = new Elysia()
       };
     }
     if (error instanceof DatabaseError) {
+      console.error("Database Error: ", error);
       return {
         status: 500,
         message: "Whoops! Our Database is down.",
       };
     }
+    console.error("Server Error: ", error);
     return {
       status: 500,
       message: "Internal Server Error",
@@ -52,10 +57,11 @@ const app = new Elysia()
   .use(
     cors({
       origin: "*",
-    }),
+    })
   )
   .use(exploreRouter)
   .use(paymentRouter)
+  .use(clerkWebhook)
   .get("/", () => "NamasteBites")
   .listen(port);
 console.log(`Server running at ${app.server?.hostname}:${port}`);

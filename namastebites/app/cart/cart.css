@@ -77,6 +77,53 @@
           flex-direction: column;
           gap: 1rem;
           padding: 1rem;
+          .payment-mode-selection {
+            h3 {
+              font-size: 1rem;
+              font-weight: bold;
+              color: var(--color-light);
+              margin: 0 0 0.75rem 0;
+            }
+            .payment-mode-options {
+              display: flex;
+              gap: 0.75rem;
+              flex-direction: column;
+              .payment-mode-option {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+                border-radius: 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.02);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                input[type="radio"] {
+                  display: none;
+                }
+                &:hover {
+                  background: rgba(255, 255, 255, 0.05);
+                }
+                &.active {
+                  border-color: var(--color-primary);
+                  background: rgba(255, 255, 255, 0.08);
+                }
+                .mode-label {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.75rem;
+                  color: var(--color-light);
+                  font-size: 0.875rem;
+                  .mode-icon {
+                    font-size: 1.25rem;
+                  }
+                  .mode-text {
+                    font-weight: 500;
+                  }
+                }
+              }
+            }
+          }
           .special-instructions {
             textarea {
               width: 100%;

@@ -2,9 +2,9 @@ import path from "@/app/path/path";
 import {
   exploreItemType,
   FilterType,
-  ResponseType,
   SortType,
 } from "@/app/types/types";
+import withResult from "../../internal/withResult";
 type ItemRequestType = {
   single: string;
 };
@@ -17,28 +17,19 @@ type ListRequestType = {
 };
 type ExploreRequestType = ItemRequestType | ListRequestType;
 async function explore(props?: ExploreRequestType) {
-  // const info = {
-  //   single: null,
-  //   sorting: null,
-  //   limit: null,
-  //   offset: null,
-  //   globalSearch: null,
-  //   ...props,
-  // };
-  const response = await fetch(`${path}/explore`, {
+  const response = await withResult(fetch(`${path}/explore`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(props),
-  });
-  const data = await response.json();
-  return data;
+  }));
+  return response;
 }
 export async function getItem(props: ItemRequestType) {
-  return (await explore(props)) as ResponseType<{ item: exploreItemType }>;
+  return (await explore(props)) as { item: exploreItemType };
 }
 
 export async function getItems(props?: ListRequestType) {
-  return (await explore(props)) as ResponseType<{ items: exploreItemType[] }>;
+  return (await explore(props)) as { items: exploreItemType[] };
 }

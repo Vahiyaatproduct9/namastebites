@@ -4,13 +4,9 @@ import payment from "@service/razorpay/payment.service";
 async function createOrder(ctx: Context) {
   return await DBTransaction(payment.createOrderService(ctx));
 }
+
 async function verifyOrder(ctx: Context) {
-  try {
-    return await payment.verifyPaymentService(ctx);
-  } catch (error) {
-    console.log(error);
-    throw new Error("Something went wrong");
-  }
+  return await DBTransaction(payment.verifyPaymentService(ctx));
 }
 
 export default {

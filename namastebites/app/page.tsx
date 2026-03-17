@@ -16,7 +16,7 @@ export default function Home() {
     (id: string) => {
       addToCart(items.find((t) => t.id === id)!);
     },
-    [addToCart, items],
+    [addToCart, items]
   );
   const removeItem = useCart((s) => s.decreaseQuantity);
   function addButton(id: string, e: React.MouseEvent<HTMLButtonElement>) {
@@ -29,18 +29,16 @@ export default function Home() {
   }
   useEffect(() => {
     const items: Food[] = [];
-    getItems({ limit: 5 }).then((res) => {
-      if (res.status === 200) {
-        res.data?.items.map((item) => {
-          items.push({
-            id: item.item_id.toString(),
-            name: item.name,
-            price: Number(item.price),
-            url: item.image_url,
-            quantity: 0,
-          });
+    getItems({ limit: 5 }).then((data) => {
+      data?.items.map((item) => {
+        items.push({
+          id: item.item_id.toString(),
+          name: item.name,
+          price: Number(item.price),
+          url: item.image_url,
+          quantity: 0,
         });
-      }
+      });
       setItems(items);
     });
   }, []);
