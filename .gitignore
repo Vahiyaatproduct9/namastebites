@@ -53,7 +53,7 @@ server/coverage
 # next.js
 server/.next/
 server/out/
-
+server/server
 # production
 server/build
 
