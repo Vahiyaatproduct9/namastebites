@@ -9,6 +9,7 @@
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
     "elysia": "latest",
+    "jose": "^6.2.2",
     "pg": "^8.18.0",
     "razorpay": "^2.9.6",
     "svix": "^1.88.0",

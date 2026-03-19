@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import "./cart.css";
 import { useRouter } from "next/navigation";
-import { useCart } from "@store/useCart";
+import { useCart } from "@/app/store/useCart";
 import Script from "next/script";
-import { CartItem, Food, RazorPayVerify } from "../types/types";
+import { CartItem, Food } from "../types/types";
 import Order from "@api/payment/orders";
 import useMessage from "../store/useMessage";
 import { useUser } from "@clerk/nextjs";
@@ -22,6 +22,7 @@ const Cart = () => {
   const [instruction, setInstruction] = useState<string>("");
   const [totalPrice, setTotalPrice] = React.useState<number>(0);
   const [paymentMode, setPaymentMode] = useState<"online" | "cod">("online");
+  const [loading, setLoading] = useState(false);
 
   const { locations, currentLocationId } = useLocation();
   const currentLocation = locations.find((l) => l.id === currentLocationId);
@@ -43,31 +44,43 @@ const Cart = () => {
       router.push("/settings?fromCart=true");
       return;
     }
-    const data: CartItem[] = cart;
-    if (paymentMode === "cod") {
-      const response = await Order.PaymentCashOnDelivery({
-        data,
-        instruction,
-        user_id: user?.id || "",
-      });
-      console.log("payment response: ", response);
-    } else if (paymentMode === "online") {
-      const response = await Order.PaymentOnline({
-        data,
-        instruction,
-        user: {
-          id: user?.id || "",
-          name: user?.fullName || "",
-          phone: phone || "",
-          email: user?.emailAddresses[0]?.emailAddress || "",
-        },
-      });
-      console.log("Payment Response: ", response);
+    setLoading(true);
+    try {
+      const data: CartItem[] = cart;
+      if (paymentMode === "cod") {
+        const response = await Order.PaymentCashOnDelivery({
+          data,
+          instruction,
+          user_id: user?.id || "",
+        });
+        console.log("payment response: ", response);
+        if (response) {
+          useCart.getState().clearCart();
+          router.push(`/thankyou?amount=${totalPrice}&mode=cod`);
+        }
+      } else if (paymentMode === "online") {
+        const response = await Order.PaymentOnline({
+          data,
+          instruction,
+          user: {
+            id: user?.id || "",
+            name: user?.fullName || "",
+            phone: phone || "",
+            email: user?.emailAddresses[0]?.emailAddress || "",
+          },
+        });
+        console.log("Payment Response: ", response);
+        if (response) {
+          router.push(`/thankyou?amount=${totalPrice}&mode=online`);
+        }
+      }
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      setMessage("Checkout failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
-  useEffect(() => {
-    router.push("/settings", { data: "hello" });
-  }, []);
   useEffect(() => {
     console.log("instruction updated!", instruction);
   }, [instruction]);
@@ -120,9 +133,14 @@ const Cart = () => {
                       {currentLocation ? (
                         `${currentLocation.address}, ${currentLocation.city}${currentLocation.landmark ? ` (Near ${currentLocation.landmark})` : ""}`
                       ) : (
-                        <span style={{ color: "#ff4d4d" }}>No delivery location selected</span>
+                        <span style={{ color: "#ff4d4d" }}>
+                          No delivery location selected
+                        </span>
                       )}
-                      <button className="change-location-btn" onClick={goToSettings}>
+                      <button
+                        className="change-location-btn"
+                        onClick={goToSettings}
+                      >
                         {currentLocation ? "Change" : "Add Location"}
                       </button>
                     </text>
@@ -181,12 +199,26 @@ const Cart = () => {
                   />
                 </div>
                 {!currentLocation && (
-                  <p style={{ color: "#ff4d4d", marginBottom: "10px", textAlign: "center", fontSize: "0.9rem" }}>
+                  <p
+                    style={{
+                      color: "#ff4d4d",
+                      marginBottom: "10px",
+                      textAlign: "center",
+                      fontSize: "0.9rem",
+                    }}
+                  >
                     Please set your delivery location to proceed.
                   </p>
                 )}
                 {!isProfileComplete && (
-                  <p style={{ color: "#ff4d4d", marginBottom: "10px", textAlign: "center", fontSize: "0.9rem" }}>
+                  <p
+                    style={{
+                      color: "#ff4d4d",
+                      marginBottom: "10px",
+                      textAlign: "center",
+                      fontSize: "0.9rem",
+                    }}
+                  >
                     Please add your phone number in settings to proceed.
                   </p>
                 )}
@@ -196,7 +228,7 @@ const Cart = () => {
                   <div className="checkout-total-value">₹{totalPrice}</div>
                 </div>
                 <div className="checkout-button-container">
-                  {(!currentLocation || !isProfileComplete) ? (
+                  {!currentLocation || !isProfileComplete ? (
                     <button
                       className="checkout-button"
                       onClick={goToSettings}
@@ -207,14 +239,16 @@ const Cart = () => {
                   ) : (
                     <button
                       className="checkout-button"
-                      disabled={totalPrice === 0}
+                      disabled={totalPrice === 0 || loading}
                       style={{
-                        opacity: (totalPrice === 0) ? 0.5 : 1,
-                        cursor: (totalPrice === 0) ? "not-allowed" : "pointer",
+                        opacity: (totalPrice === 0 || loading) ? 0.5 : 1,
+                        cursor: (totalPrice === 0 || loading) ? "not-allowed" : "pointer",
                       }}
                       onClick={checkout}
                     >
-                      Proceed to Checkout
+                      {loading ? (
+                        <div className="loading-spinner-small"></div>
+                      ) : "Proceed to Checkout"}
                     </button>
                   )}
                 </div>

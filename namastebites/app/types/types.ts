@@ -78,3 +78,20 @@ export type LocationType = {
   lat?: number;
   lng?: number;
 };
+
+export type orderListSchema = {
+  id: string;
+  status: "pending" | "delivered" | "cancelled";
+  items: {
+    diet: string;
+    name: string;
+    price: string;
+    active: string;
+    item_id: string;
+    category: string;
+    quantity: string;
+    image_url: string;
+    description: string;
+    order_frequency?: string;
+  }[];
+}[];

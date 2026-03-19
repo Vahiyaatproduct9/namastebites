@@ -1,4 +1,4 @@
-import z, { object } from "zod";
+import z, { array, object, optional, string } from "zod";
 
 export type ResponseType = {
   status: number;
@@ -28,6 +28,16 @@ export const createOrUpdateUserSchema = z.object({
   object: z.enum(["event"]),
 });
 
+export const updateUserSchema = z.object({
+  data: z.optional(
+    z.object({
+      name: z.optional(z.string()),
+      phone: z.optional(z.string()),
+      email: z.optional(z.email()),
+    }),
+  ),
+});
+
 export const deleteUserSchema = z.object({
   data: z.object({
     deleted: z.boolean(),
@@ -38,3 +48,23 @@ export const deleteUserSchema = z.object({
   timestamp: z.number(),
   type: z.enum(["user.deleted"]),
 });
+
+export const orderListSchema = array(
+  object({
+    id: string(),
+    items: array(
+      object({
+        diet: string(),
+        name: string(),
+        price: string(),
+        active: string(),
+        item_id: string(),
+        category: string(),
+        quantity: string(),
+        image_url: string(),
+        description: string(),
+        order_frequency: optional(string()),
+      }),
+    ),
+  }),
+);

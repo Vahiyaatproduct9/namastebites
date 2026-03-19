@@ -68,12 +68,14 @@ async function PaymentOnline(data: {
   }
   try {
     const checkoutResponse = await showRzpScreen(rzpScreenData);
-    console.log("checkoutResponse: ", checkoutResponse);
     if (!checkoutResponse) {
       setMessage("Payment failed");
       return false;
     }
-    const verifyResponse = await verifyPayment(checkoutResponse);
+    const verifyResponse: boolean = await verifyPayment(checkoutResponse);
+    if (verifyResponse) {
+      clearCart();
+    }
     return verifyResponse;
   } catch (error) {
     console.error("Payment process failed:", error);
@@ -167,7 +169,7 @@ async function verifyPayment(
   data: RazorPayVerify & {
     user_id: string | null;
   },
-) {
+): Promise<boolean> {
   const response = await fetch(`${path}/payment/verify`, {
     method: "POST",
     headers: {
@@ -177,20 +179,18 @@ async function verifyPayment(
   });
   if (!response.ok) {
     setMessage("Payment verification failed!");
-    return new Error("Payment verification failed!");
+    return false;
   }
-  const {
-    success,
-    data: result,
-    message,
-  }: JsonResponse = await response.json();
+  const { success, message }: JsonResponse = await response.json();
   setType(success ? "success" : "error");
   setMessage(message || defaultErrMsg);
   if (!success) {
-    return new Error(message || defaultErrMsg);
+    setMessage(message || defaultErrMsg);
+    setType("error");
+    return false;
   }
   // clearCart();
-  return result;
+  return true;
 }
 
 const order = {

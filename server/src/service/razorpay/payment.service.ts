@@ -34,17 +34,17 @@ const createOrderService = (ctx: Context) => async (client: PoolClient) => {
     amount += Number(item_price) * item_quantity;
   }
   console.log("total_amount:", amount);
-  const order = await razorpay.orders.create({
-    // Multiplying by 100 to convert to Rupees
-    amount: amount * 100,
-    currency: "INR",
-    receipt: "receipt",
-    notes: {
-      message: "Order initiated!",
-    },
-  });
-  console.log("razorpay order created:", order);
   if (mode === "online") {
+    const order = await razorpay.orders.create({
+      // Multiplying by 100 to convert to Rupees
+      amount: amount * 100,
+      currency: "INR",
+      receipt: "receipt",
+      notes: {
+        message: "Order initiated!",
+      },
+    });
+    console.log("razorpay order created:", order);
     const createOrder = (
       await client.query(
         // WE HAVE TO CREATE USER FIRST
@@ -104,6 +104,11 @@ const createOrderService = (ctx: Context) => async (client: PoolClient) => {
         ],
       )
     ).rows[0];
+    return {
+      status: 201,
+      message: "Order created successfully",
+      data: { order, amount },
+    };
   } else if (mode === "cash_on_delivery") {
     // run offline method
     // pgadmin is too heavy, ill just use nvim
@@ -127,7 +132,7 @@ const createOrderService = (ctx: Context) => async (client: PoolClient) => {
           VALUES (
             'cash_on_delivery'::paymentmethod,
             $2,
-            $3
+            NULL
           )
           RETURNING *
         ),
@@ -145,8 +150,8 @@ const createOrderService = (ctx: Context) => async (client: PoolClient) => {
             t.id,
 -- location id is null FOR NOW, it cannot be null
             NULL,
-            $4,
-            'confirmed'::orderstatus, $5
+            $2,
+            'confirmed'::orderstatus, $3
           FROM t
           RETURNING *
         ),
@@ -161,7 +166,7 @@ const createOrderService = (ctx: Context) => async (client: PoolClient) => {
           (SELECT o.id FROM o),
           item_id,
           quantity
-        FROM UNNEST($6::INT[], $7::INT[]) DATA(item_id, quantity)
+        FROM UNNEST($4::INT[], $5::INT[]) DATA(item_id, quantity)
         )
         SELECT TO_JSONB(t) as transactions,
         TO_JSONB(o) AS orders
@@ -171,8 +176,6 @@ const createOrderService = (ctx: Context) => async (client: PoolClient) => {
         [
           clerk_id,
           amount,
-          order.id,
-          amount,
           special_instructions || null,
           items.map((t) => t.id),
           items.map((t) => t.quantity),
@@ -181,11 +184,10 @@ const createOrderService = (ctx: Context) => async (client: PoolClient) => {
       )
     ).rows[0];
   }
-  console.log("order:", order);
   return {
     status: 200,
     message: "Order created successfully",
-    data: { order, amount },
+    data: { amount },
   };
 };
 

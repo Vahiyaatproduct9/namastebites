@@ -30,6 +30,7 @@ const Settings = () => {
 
   const { phone, setPhone, setName, setEmail } = useProfile();
   const [phoneInput, setPhoneInput] = useState(phone || "");
+  const [savingPhone, setSavingPhone] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -56,9 +57,17 @@ const Settings = () => {
       setMessage("Please enter a valid 10 or 11 digit phone number!");
       return;
     }
-    await setPhone(phoneInput);
-    setType("success");
-    setMessage("Phone number updated!");
+    setSavingPhone(true);
+    try {
+      await setPhone(phoneInput);
+      setType("success");
+      setMessage("Phone number updated!");
+    } catch (error) {
+      setType("error");
+      setMessage("Failed to update phone number.");
+    } finally {
+      setSavingPhone(false);
+    }
   };
 
   const handlePhoneInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +76,20 @@ const Settings = () => {
       setPhoneInput(value);
     }
   };
+
+  async function setLocationFromCoords(lat: number, lng: number) {
+    const response = await getLocationFromCoords(lat, lng);
+    if (response.success) {
+      const { address, city, locality } = response.data;
+      setAddress(locality || address.split(",")[0]);
+      setCity(city || "");
+      setType("success");
+      setMessage("Location fetched successfully! Please review the details.");
+    } else {
+      setType("error");
+      setMessage(response.message || "Failed to fetch location details");
+    }
+  }
 
   const handleUseCurrentLocation = () => {
     console.log("get current location clicked!");
@@ -81,32 +104,17 @@ const Settings = () => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
         console.log("postiion: ", position);
-        if (!lat || !lng) {
-          const response = await fetch(`https://ipapi.co/json`);
-          const { latitude: lat, longitude: lng } = await response.json();
-          console.log("ip location: ", lat, lng);
-          setCoords({ lat, lng });
-        } else {
-          setCoords({ lat, lng });
-        }
-
-        const response = await getLocationFromCoords(lat, lng);
-        if (response.success) {
-          const { address, city, locality } = response.data;
-          setAddress(locality || address.split(",")[0]);
-          setCity(city || "");
-          setType("success");
-          setMessage(
-            "Location fetched successfully! Please review the details.",
-          );
-        } else {
-          setType("error");
-          setMessage(response.message || "Failed to fetch location details");
-        }
+        setCoords({ lat, lng });
+        await setLocationFromCoords(lat, lng);
       },
-      (error) => {
+      async (error) => {
         setType("error");
         setMessage("Unable to retrieve your location: " + error.message);
+        const response = await fetch(`https://ipapi.co/json`);
+        const { latitude: lat, longitude: lng } = await response.json();
+        console.log("ip location: ", lat, lng);
+        setCoords({ lat, lng });
+        await setLocationFromCoords(lat, lng);
       },
       {
         enableHighAccuracy: true,
@@ -203,8 +211,12 @@ const Settings = () => {
                 onChange={handlePhoneInputChange}
                 placeholder="Enter 10-11 digit phone number"
               />
-              <button className="save-phone-btn" onClick={handlePhoneSave}>
-                Save Phone
+              <button 
+                className="save-phone-btn" 
+                onClick={handlePhoneSave}
+                disabled={savingPhone}
+              >
+                {savingPhone ? <div className="loading-spinner-small"></div> : "Save Phone"}
               </button>
             </div>
             {(!phone || phone.length < 10 || phone.length > 11) && (
@@ -288,6 +300,15 @@ const Settings = () => {
             )}
           </div>
         </div>
+
+        {fromCart && (
+          <div className="cart-navigation">
+            <button className="back-to-cart-btn" onClick={() => router.push("/cart")}>
+              <span className="material-symbols-outlined">shopping_cart</span>
+              Back to Cart
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
