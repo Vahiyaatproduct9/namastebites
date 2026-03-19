@@ -7,7 +7,7 @@ import z from "zod";
 
 const userService = (event: any) => async (client: PoolClient) => {
   Bun.write("data/create-user-info.json", JSON.stringify(event, null, 2)).then(
-    () => console.log("Done!")
+    () => console.log("Done!"),
   );
   const { type } = event;
   z.enum(["user.created", "user.updated", "user.deleted"]).parse(type);
@@ -19,7 +19,7 @@ const userService = (event: any) => async (client: PoolClient) => {
       instance_id,
       timestamp,
     } = createOrUpdateUserSchema.parse(event);
-    const name = `${first_name} ${last_name}`;
+    const name = [first_name, last_name].filter(Boolean).join(" ");
     const email = email_addresses[0]?.email_address || null;
     if (type === "user.created") {
       const userExsists = (
@@ -27,7 +27,7 @@ const userService = (event: any) => async (client: PoolClient) => {
           `
       SELECT 1 FROM USERS WHERE CLERK_ID = $1
     `,
-          [id]
+          [id],
         )
       ).rows[0];
       if (userExsists) {
@@ -43,7 +43,7 @@ const userService = (event: any) => async (client: PoolClient) => {
         VALUES ($1, $2, $3)
         RETURNING user_id, email, name
         `,
-          [id, email, name]
+          [id, email, name],
         )
       ).rows[0];
     }
@@ -64,7 +64,7 @@ const userService = (event: any) => async (client: PoolClient) => {
         WHERE clerk_id = $1
         RETURNING user_id, email, name
       `,
-      [id, email, name]
+      [id, email, name],
     );
   } else if (type === "user.deleted") {
     const {
@@ -76,15 +76,15 @@ const userService = (event: any) => async (client: PoolClient) => {
         WHERE clerk_id = $1
         RETURNING user_id, email, name
       `,
-      [id]
+      [id],
     );
   }
   const verb =
     type === "user.created"
       ? "created"
       : type === "user.updated"
-      ? "updated"
-      : "deleted";
+        ? "updated"
+        : "deleted";
   return {
     message: `User ${verb} successfully`,
     status: type === "user.created" ? 201 : 200,

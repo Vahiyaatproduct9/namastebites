@@ -2,6 +2,7 @@ import { DB } from "@/class/Database";
 import { exploreRequestBody } from "@/types/payment.type";
 import { Context } from "elysia";
 const list = async (ctx: Context) => {
+  console.log("explore body: ", ctx.body);
   const body = exploreRequestBody.parse(ctx.body);
   if (body?.single) {
     const item = (

@@ -1,5 +1,8 @@
 import { createUser } from "@controller/user/user.controlller";
+import { getLocationDetails } from "@controller/user/location.controller";
 import Elysia from "elysia";
 
-const userRouter = new Elysia({ prefix: "/user" }).post("/", createUser);
+const userRouter = new Elysia({ prefix: "/user" })
+  .post("/", createUser)
+  .get("/location", getLocationDetails);
 export default userRouter;

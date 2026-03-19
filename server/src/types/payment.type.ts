@@ -5,7 +5,7 @@ const paymentOrderSchema = z.object({
   notes: z.optional(
     z.object({
       message: z.string(),
-    })
+    }),
   ),
 });
 
@@ -16,10 +16,11 @@ const createOrderSchema = z.object({
       name: z.string(),
       price: z.number(),
       quantity: z.number(),
-    })
+    }),
   ),
   user_id: z.string(),
   special_instructions: z.optional(z.string()),
+  mode: z.enum(["online", "cash_on_delivery"] as const),
 });
 
 const verifyOrderSchema = z.object({
@@ -46,7 +47,7 @@ const exploreRequestBody = z.union([
           id: z.string(),
           value: z.union([z.string(), z.array(z.string())]),
           type: z.enum(exploreType),
-        })
+        }),
       )
       .optional(),
     sorting: z.union([

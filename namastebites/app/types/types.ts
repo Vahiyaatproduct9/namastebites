@@ -69,3 +69,12 @@ export type SortType = {
   id: string;
   desc: boolean;
 };
+
+export type LocationType = {
+  id: string;
+  address: string;
+  city: string;
+  landmark: string;
+  lat?: number;
+  lng?: number;
+};

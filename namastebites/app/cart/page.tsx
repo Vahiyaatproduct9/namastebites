@@ -9,8 +9,12 @@ import { CartItem, Food, RazorPayVerify } from "../types/types";
 import Order from "@api/payment/orders";
 import useMessage from "../store/useMessage";
 import { useUser } from "@clerk/nextjs";
+import { useLocation } from "../store/useLocation";
+import useProfile from "../store/useProfile";
+
 const Cart = () => {
   const { user } = useUser();
+  const { phone } = useProfile();
   const router = useRouter();
   const setMessage = useMessage((s) => s.setMessage);
   const cart = useCart((s) => s.cart);
@@ -18,6 +22,10 @@ const Cart = () => {
   const [instruction, setInstruction] = useState<string>("");
   const [totalPrice, setTotalPrice] = React.useState<number>(0);
   const [paymentMode, setPaymentMode] = useState<"online" | "cod">("online");
+
+  const { locations, currentLocationId } = useLocation();
+  const currentLocation = locations.find((l) => l.id === currentLocationId);
+  const isProfileComplete = phone && phone.length >= 10 && phone.length <= 11;
   useEffect(() => {
     const total = getTotalPrice();
     setTotalPrice(total);
@@ -26,56 +34,40 @@ const Cart = () => {
   const goToExplore = () => {
     router.push("/explore");
   };
+  const goToSettings = () => {
+    router.push("/settings?fromCart=true");
+  };
   const checkout = async () => {
-    const data: CartItem[] = cart;
-    const { order } = await Order.initiatePaymentOnline({
-      data,
-      instruction,
-      user_id: user?.id || "",
-    });
-    if (!order) {
-      console.log("no order found!");
+    if (!currentLocation) {
+      setMessage("Please select a delivery location first!");
+      router.push("/settings?fromCart=true");
       return;
     }
-    const RZP_KEY = process.env.NEXT_PUBLIC_RZP_KEY;
-    const options = {
-      key: RZP_KEY,
-      amount: order.amount,
-      currency: "INR",
-      description: "Namaste Bites",
-      image: "http://picsum.photos/400/400",
-      order_id: order.id,
-      handler: async (res: RazorPayVerify) => {
-        console.log("response: ", res);
-        const data = {
-          ...res,
-          user_id: user?.id || null,
-        };
-        await Order.verifyPayment(data);
-        router.push("/explore");
-      },
-      prefill: {
-        name: "Grishma",
-        email: "grishmadev@proton.me",
-        phone: "+911234567890",
-      },
-      notes: {
-        info1: instruction,
-      },
-      theme: {
-        color: "#CCC",
-      },
-      retry: {
-        max_count: 3,
-      },
-    };
-    const rzp = new window.Razorpay(options);
-    rzp.open();
-    rzp.on("payment.failed", (res: Error) => {
-      console.log("payment failed!", res);
-      setMessage("Payment failed!");
-    });
+    const data: CartItem[] = cart;
+    if (paymentMode === "cod") {
+      const response = await Order.PaymentCashOnDelivery({
+        data,
+        instruction,
+        user_id: user?.id || "",
+      });
+      console.log("payment response: ", response);
+    } else if (paymentMode === "online") {
+      const response = await Order.PaymentOnline({
+        data,
+        instruction,
+        user: {
+          id: user?.id || "",
+          name: user?.fullName || "",
+          phone: phone || "",
+          email: user?.emailAddresses[0]?.emailAddress || "",
+        },
+      });
+      console.log("Payment Response: ", response);
+    }
   };
+  useEffect(() => {
+    router.push("/settings", { data: "hello" });
+  }, []);
   useEffect(() => {
     console.log("instruction updated!", instruction);
   }, [instruction]);
@@ -120,12 +112,19 @@ const Cart = () => {
                 <div className="checkout-info">
                   <span>
                     <text>Name</text>
-                    <text>John Doe</text>
+                    <text>{user?.fullName || "Guest"}</text>
                   </span>
                   <span>
                     <text>Location</text>
                     <text>
-                      Street 1, Aurora Lane, Kolkata, West Bengal, 700001
+                      {currentLocation ? (
+                        `${currentLocation.address}, ${currentLocation.city}${currentLocation.landmark ? ` (Near ${currentLocation.landmark})` : ""}`
+                      ) : (
+                        <span style={{ color: "#ff4d4d" }}>No delivery location selected</span>
+                      )}
+                      <button className="change-location-btn" onClick={goToSettings}>
+                        {currentLocation ? "Change" : "Add Location"}
+                      </button>
                     </text>
                   </span>
                   <span>
@@ -181,23 +180,43 @@ const Cart = () => {
                     placeholder="Add any special instructions for your order..."
                   />
                 </div>
+                {!currentLocation && (
+                  <p style={{ color: "#ff4d4d", marginBottom: "10px", textAlign: "center", fontSize: "0.9rem" }}>
+                    Please set your delivery location to proceed.
+                  </p>
+                )}
+                {!isProfileComplete && (
+                  <p style={{ color: "#ff4d4d", marginBottom: "10px", textAlign: "center", fontSize: "0.9rem" }}>
+                    Please add your phone number in settings to proceed.
+                  </p>
+                )}
                 <p>Delivery charges will be calculated at checkout</p>
                 <div className="checkout-total">
                   <div className="checkout-total-label">Total</div>
                   <div className="checkout-total-value">₹{totalPrice}</div>
                 </div>
                 <div className="checkout-button-container">
-                  <button
-                    className="checkout-button"
-                    disabled={totalPrice === 0}
-                    style={{
-                      opacity: totalPrice === 0 ? 0.5 : 1,
-                      cursor: totalPrice === 0 ? "not-allowed" : "pointer",
-                    }}
-                    onClick={checkout}
-                  >
-                    Proceed to Checkout
-                  </button>
+                  {(!currentLocation || !isProfileComplete) ? (
+                    <button
+                      className="checkout-button"
+                      onClick={goToSettings}
+                      style={{ background: "var(--color-primary)" }}
+                    >
+                      Complete Profile in Settings
+                    </button>
+                  ) : (
+                    <button
+                      className="checkout-button"
+                      disabled={totalPrice === 0}
+                      style={{
+                        opacity: (totalPrice === 0) ? 0.5 : 1,
+                        cursor: (totalPrice === 0) ? "not-allowed" : "pointer",
+                      }}
+                      onClick={checkout}
+                    >
+                      Proceed to Checkout
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

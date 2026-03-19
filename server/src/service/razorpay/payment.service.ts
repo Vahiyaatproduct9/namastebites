@@ -11,6 +11,7 @@ const createOrderService = (ctx: Context) => async (client: PoolClient) => {
     items,
     user_id: clerk_id,
     special_instructions,
+    mode,
   } = createOrderSchema.parse(ctx.body);
   const item_ids = items.map((item) => item.id);
   // Fetching from Database instead of using client data to make sure the data is safe
@@ -43,65 +44,143 @@ const createOrderService = (ctx: Context) => async (client: PoolClient) => {
     },
   });
   console.log("razorpay order created:", order);
-  const createOrder = (
-    await client.query(
-      `
-      WITH u as (
-        SELECT user_id
-        FROM USERS
-        WHERE CLERK_ID = $1
-      ),
-      t AS (
-        INSERT INTO transactions
-        (
-          payment_method,
-          amount_paid,
-          razorpay_order_id
+  if (mode === "online") {
+    const createOrder = (
+      await client.query(
+        // WE HAVE TO CREATE USER FIRST
+        `
+        WITH u as (
+          SELECT user_id
+          FROM USERS
+          WHERE CLERK_ID = $1
+        ),
+        t AS (
+          INSERT INTO transactions
+          (
+            payment_method,
+            amount_paid,
+            razorpay_order_id
+          )
+          VALUES (
+            'online'::paymentmethod,
+            0,
+            $2
+          )
+          RETURNING *
+        ),
+        o AS (
+          INSERT INTO orders
+            (user_id,
+            transaction_id,
+            location_id,
+            total_price,
+            status,
+            special_instructions)
+          SELECT (SELECT u.user_id FROM u), t.id, NULL, $3, 'initiated'::orderstatus, $4
+          FROM t
+          RETURNING *
+        ),
+        oi AS (
+          INSERT INTO ORDER_ITEMS(
+            order_id,
+            item_id,
+            quantity
+          )
+        SELECT (SELECT o.id FROM o), item_id, quantity
+        FROM UNNEST($5::INT[], $6::INT[]) DATA(item_id, quantity)
         )
-        VALUES (
-          'online'::paymentmethod,
-          0,
-          $2
-        )
-        RETURNING *
-      ),
-      o AS (
-        INSERT INTO orders
-          (user_id,
-          transaction_id,
-          location_id,
-          total_price,
-          status,
-          special_instructions)
-        SELECT (SELECT u.user_id FROM u), t.id, NULL, $3, 'pending'::orderstatus, $4
+        SELECT TO_JSONB(t) as transactions,
+        TO_JSONB(o) AS orders
         FROM t
-        RETURNING *
-      ),
-      oi AS (
-        INSERT INTO ORDER_ITEMS(
-          order_id,
+        JOIN o ON TRUE;
+      `,
+        [
+          clerk_id,
+          order.id,
+          amount,
+          special_instructions || null,
+          items.map((t) => t.id),
+          items.map((t) => t.quantity),
+        ],
+      )
+    ).rows[0];
+  } else if (mode === "cash_on_delivery") {
+    // run offline method
+    // pgadmin is too heavy, ill just use nvim
+    const createOfflineOrder = (
+      await client.query(
+        `
+-- first we get the user info
+      WITH u as (
+          SELECT user_id
+          FROM USERS
+          WHERE CLERK_ID = $1
+        ),
+-- insert the order data into transactions
+        t AS (
+          INSERT INTO transactions
+          (
+            payment_method,
+            amount_paid,
+            razorpay_order_id
+          )
+          VALUES (
+            'cash_on_delivery'::paymentmethod,
+            $2,
+            $3
+          )
+          RETURNING *
+        ),
+-- finally insert into the orders section
+        o AS (
+          INSERT INTO orders
+            (user_id,
+            transaction_id,
+            location_id,
+            total_price,
+            status,
+            special_instructions)
+          SELECT
+            (SELECT u.user_id FROM u),
+            t.id,
+-- location id is null FOR NOW, it cannot be null
+            NULL,
+            $4,
+            'confirmed'::orderstatus, $5
+          FROM t
+          RETURNING *
+        ),
+-- insert the items that we ordered
+        oi AS (
+          INSERT INTO ORDER_ITEMS(
+            order_id,
+            item_id,
+            quantity
+          )
+        SELECT
+          (SELECT o.id FROM o),
           item_id,
           quantity
+        FROM UNNEST($6::INT[], $7::INT[]) DATA(item_id, quantity)
         )
-      SELECT (SELECT o.id FROM o), item_id, quantity
-      FROM UNNEST($5::INT[], $6::INT[]) DATA(item_id, quantity)
+        SELECT TO_JSONB(t) as transactions,
+        TO_JSONB(o) AS orders
+        FROM t
+        JOIN o ON TRUE;
+`,
+        [
+          clerk_id,
+          amount,
+          order.id,
+          amount,
+          special_instructions || null,
+          items.map((t) => t.id),
+          items.map((t) => t.quantity),
+        ],
+        // we couldve reused amount here but i forgot </3
       )
-      SELECT TO_JSONB(t) as transactions,
-      TO_JSONB(o) AS orders
-      FROM t
-      JOIN o ON TRUE;
-    `,
-      [
-        clerk_id,
-        order.id,
-        amount,
-        special_instructions || null,
-        items.map((t) => t.id),
-        items.map((t) => t.quantity),
-      ],
-    )
-  ).rows[0];
-
+    ).rows[0];
+  }
   console.log("order:", order);
   return {
     status: 200,
@@ -150,11 +229,22 @@ const verifyPaymentService = (ctx: Context) => async (client: PoolClient) => {
   // I HOPE I HAVE SET IT UP ALL WELL 😅
   await client.query(
     `
-    UPDATE transactions
-    SET razorpay_payment_id = $1,
-    status = 'completed'::transactionstatus,
-    amount_paid = $2
-    WHERE razorpay_order_id = $3
+    WITH U AS (
+      UPDATE transactions
+      SET razorpay_payment_id = $1,
+      status = 'completed'::transactionstatus,
+      amount_paid = $2
+      WHERE razorpay_order_id = $3
+    ),
+    O AS (
+      UPDATE orders
+      SET STATUS = 'confirmed'::orderstatus
+      WHERE transaction_id IN (
+        SELECT id FROM transactions
+        WHERE razorpay_order_id = $3
+      )
+    )
+      SELECT 1;
     `,
     [razorpay_payment_id, amount, razorpay_order_id],
   );

@@ -61,6 +61,7 @@ const app = new Elysia()
   )
   .use(exploreRouter)
   .use(paymentRouter)
+  .use(userRouter)
   .use(clerkWebhook)
   .get("/", () => "NamasteBites")
   .listen(port);
