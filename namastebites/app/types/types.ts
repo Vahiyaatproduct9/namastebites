@@ -69,3 +69,29 @@ export type SortType = {
   id: string;
   desc: boolean;
 };
+
+export type LocationType = {
+  id: string;
+  address: string;
+  city: string;
+  landmark: string;
+  lat?: number;
+  lng?: number;
+};
+
+export type orderListSchema = {
+  id: string;
+  status: "pending" | "delivered" | "cancelled";
+  items: {
+    diet: string;
+    name: string;
+    price: string;
+    active: string;
+    item_id: string;
+    category: string;
+    quantity: string;
+    image_url: string;
+    description: string;
+    order_frequency?: string;
+  }[];
+}[];

@@ -2,10 +2,12 @@ import { writeFile } from "fs/promises";
 import {
   createOrUpdateUserSchema,
   deleteUserSchema,
+  updateUserSchema,
 } from "@/types/global.type";
 import { Context } from "elysia";
 import { PoolClient } from "pg";
 import z from "zod";
+import { getClerkId } from "@/utils/http_helper";
 const userService = (ctx: Context) => async (client: PoolClient) => {
   await writeFile(
     "data/create-user-info.json",
@@ -91,8 +93,42 @@ const userService = (ctx: Context) => async (client: PoolClient) => {
   };
 };
 
-// const updateUserService => (ctx: Context) => async (client: PoolClient) => {
-//   // uclient hfiuh slejoir
-// }
+export const updateUserService =
+  (ctx: Context) => async (client: PoolClient) => {
+    console.log("body:", ctx.body);
+    const { clerk_id, success } = await getClerkId(
+      ctx.headers as Record<string, string>,
+    );
+    if (!success) return { status: 401, message: "Unauthorized" };
+    const { data } = updateUserSchema.parse(ctx.body);
+    const email = data?.email || null;
+    const phone = data?.phone || null;
+    // Check if phone number is valid
+    if (phone && (phone.length < 10 || phone.length > 11)) {
+      return {
+        message: "Invalid phone number",
+        status: 400,
+      };
+    }
+    const name = data?.name || null;
+    const conditionsList: string[] = [];
+    if (email) conditionsList.push(`email = '${email}'`);
+    if (phone) conditionsList.push(`phone = '+91${phone}'`);
+    if (name) conditionsList.push(`name = '${name}'`);
+    const updateUser = await client.query(
+      `
+      UPDATE users
+      SET
+      ${conditionsList.join(",\n")}
+      WHERE clerk_id = $1
+      RETURNING user_id, email, name
+    `,
+      [clerk_id],
+    );
+    return {
+      message: `User updated successfully`,
+      status: 200,
+    };
+  };
 
 export default userService;

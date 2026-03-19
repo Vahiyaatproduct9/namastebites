@@ -1,5 +1,7 @@
 import { create } from "zustand";
+import { getToken } from "@clerk/nextjs";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { updateUser } from "../functions/api/user/update";
 type Profile = {
   name: string | null;
   email: string | null;
@@ -7,8 +9,7 @@ type Profile = {
   setName: (arg: string) => Promise<void>;
   setEmail: (arg: string) => Promise<void>;
   setPhone: (arg: string) => Promise<void>;
-
-}
+};
 export default create<Profile>()(
   persist(
     (set) => ({
@@ -22,11 +23,19 @@ export default create<Profile>()(
         set({ email });
       },
       setPhone: async (phone: string) => {
+        const token = await getToken();
+        updateUser(
+          {
+            phone,
+          },
+          token,
+        );
         set({ phone });
-      }
+      },
     }),
     {
-      name: 'profile',
-      storage: createJSONStorage(() => localStorage)
-    }
-  ))
+      name: "profile",
+      storage: createJSONStorage(() => localStorage),
+    },
+  ),
+);

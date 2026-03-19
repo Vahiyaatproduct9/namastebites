@@ -8,6 +8,7 @@ import { ZodError } from "zod";
 import { DatabaseError } from "pg";
 import userRouter from "@router/user.router";
 import { clerkWebhook } from "./webhooks/clerk";
+import orderRouter from "@router/order.router";
 const app = new Elysia()
   .onRequest((ctx) => {
     console.log("ctx body:", JSON.stringify(ctx.request.body, null, 2));
@@ -57,10 +58,12 @@ const app = new Elysia()
   .use(
     cors({
       origin: "*",
-    })
+    }),
   )
   .use(exploreRouter)
   .use(paymentRouter)
+  .use(userRouter)
+  .use(orderRouter)
   .use(clerkWebhook)
   .get("/", () => "NamasteBites")
   .listen(port);

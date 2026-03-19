@@ -53,7 +53,7 @@ server/coverage
 # next.js
 server/.next/
 server/out/
-
+server/server
 # production
 server/build
 
@@ -83,3 +83,4 @@ server/.vercel
 **/package-lock.json
 **/**/*.bun
 
+server/team231a.rs

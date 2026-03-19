@@ -6,7 +6,10 @@ import "./home.css";
 import Navbar from "@/app/navbar";
 import { dark } from "@clerk/ui/themes";
 import Notification from "@/app/components/popup/notifiication";
+import PhonePrompt from "@/app/components/popup/phonePrompt";
+
 const geistSans = Geist({
+
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
@@ -54,6 +57,7 @@ export default function RootLayout({
           }}
         >
           <Notification />
+          <PhonePrompt />
           <Navbar />
           {children}
         </ClerkProvider>
