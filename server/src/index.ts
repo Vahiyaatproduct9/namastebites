@@ -57,7 +57,9 @@ const app = new Elysia()
   })
   .use(
     cors({
-      origin: "*",
+      origin: "https://namastebitesv2.vercel.app/",
+      methods: ["GET", "PATCH", "POST", "DELETE"],
+      credentials: true,
     }),
   )
   .use(exploreRouter)
