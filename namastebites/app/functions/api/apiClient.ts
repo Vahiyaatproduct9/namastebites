@@ -28,6 +28,7 @@ export async function APICallFull(endpoint: string, options: APIOptions = {}) {
     headers: {
       "Content-Type": "application/json",
       "ngrok-skip-browser-warning": true,
+      credentials: "include",
       ...headers,
     },
   };
