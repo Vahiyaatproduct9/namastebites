@@ -94,7 +94,7 @@ const Cart = () => {
       <div className="cart-head">
         <h1 className="text-2xl font-bold">Cart</h1>
       </div>
-      <div className="flex-body">
+      <div className="body-holder">
         <div className="body-1">
           {totalPrice === 0 ? (
             <div className="empty-cart">
@@ -241,14 +241,19 @@ const Cart = () => {
                       className="checkout-button"
                       disabled={totalPrice === 0 || loading}
                       style={{
-                        opacity: (totalPrice === 0 || loading) ? 0.5 : 1,
-                        cursor: (totalPrice === 0 || loading) ? "not-allowed" : "pointer",
+                        opacity: totalPrice === 0 || loading ? 0.5 : 1,
+                        cursor:
+                          totalPrice === 0 || loading
+                            ? "not-allowed"
+                            : "pointer",
                       }}
                       onClick={checkout}
                     >
                       {loading ? (
                         <div className="loading-spinner-small"></div>
-                      ) : "Proceed to Checkout"}
+                      ) : (
+                        "Proceed to Checkout"
+                      )}
                     </button>
                   )}
                 </div>
