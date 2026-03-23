@@ -78,16 +78,18 @@ const SettingsContent = () => {
   };
 
   async function setLocationFromCoords(lat: number, lng: number) {
+    console.log("setLocationFromCoords");
     const response = await getLocationFromCoords(lat, lng);
-    if (response.success) {
-      const { address, city, locality } = response.data;
+    if (response) {
+      console.log("location data: ", response);
+      const { address, city, locality } = response;
       setAddress(locality || address.split(",")[0]);
       setCity(city || "");
       setType("success");
       setMessage("Location fetched successfully! Please review the details.");
     } else {
       setType("error");
-      setMessage(response.message || "Failed to fetch location details");
+      setMessage(response || "Failed to fetch location details");
     }
   }
 
@@ -112,8 +114,8 @@ const SettingsContent = () => {
         setMessage("Unable to retrieve your location: " + error.message);
         const response = await fetch(`https://ipapi.co/json`);
         const { latitude: lat, longitude: lng } = await response.json();
-        console.log("ip location: ", lat, lng);
         setCoords({ lat, lng });
+        console.log("location from error: ", lat, lng);
         await setLocationFromCoords(lat, lng);
       },
       {

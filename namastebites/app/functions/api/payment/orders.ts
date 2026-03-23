@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { APICall } from "../apiClient";
+import { APICall, APICallFull } from "../apiClient";
 import { CartItem, RazorPayVerify } from "@/app/types/types";
 import useMessage from "@/app/store/useMessage";
 import { useCart } from "@/app/store/useCart";
@@ -39,7 +39,7 @@ async function PaymentOnline(data: {
     email: string;
   };
 }): Promise<boolean> {
-  const response = await APICall("/payment/create", {
+  const result = await APICallFull("/payment/create", {
     method: "POST",
     body: {
       items: data.data,
@@ -49,12 +49,12 @@ async function PaymentOnline(data: {
     },
   });
 
-  if (!response || !response.order) {
+  if (!result.success || !result.data || !result.data.order) {
     setMessage("No Order Found. Make sure you have listed your orders.");
     return false;
   }
 
-  const { order } = response;
+  const { order } = result.data;
   const rzpScreenData = {
     order,
     user: data.user,
@@ -137,14 +137,13 @@ async function verifyPayment(
     user_id: string | null;
   },
 ): Promise<boolean> {
-  const response = await APICall("/payment/verify", {
+  const result = await APICallFull("/payment/verify", {
     method: "POST",
     body: data,
   });
 
-  if (response) {
-    // APICall already handles success message if returned in result.message
-    // and returns result.data which is likely true or additional data.
+  if (result.success) {
+    // APICallFull already handles success message if returned in result.message
     return true;
   }
   return false;

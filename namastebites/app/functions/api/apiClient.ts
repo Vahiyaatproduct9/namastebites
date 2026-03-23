@@ -9,6 +9,14 @@ export interface APIOptions {
 }
 
 export async function APICall(endpoint: string, options: APIOptions = {}) {
+  const result = await APICallFull(endpoint, options);
+  if (result.success) {
+    return result.data;
+  }
+  return null;
+}
+
+export async function APICallFull(endpoint: string, options: APIOptions = {}) {
   const setMessage = useMessage.getState().setMessage;
   const setType = useMessage.getState().setType;
 
@@ -27,7 +35,7 @@ export async function APICall(endpoint: string, options: APIOptions = {}) {
   if (body) {
     fetchOptions.body = JSON.stringify(body);
     if (method === "GET") {
-      fetchOptions.method = "POST"; // Common pattern if body is provided for GET-like searches
+      fetchOptions.method = "POST";
     }
   }
 
@@ -35,23 +43,22 @@ export async function APICall(endpoint: string, options: APIOptions = {}) {
     const response = await fetch(url, fetchOptions);
     const result = await response.json();
 
-    // The backend returns { success: boolean, status: number, data, message }
     if (result.success) {
       if (result.message) {
         setType("success");
         setMessage(result.message);
       }
-      return result.data;
+      console.log("result: ", result);
     } else {
       const errorMsg = result.message || "Something went wrong!";
       setType("error");
       setMessage(errorMsg);
-      return null;
     }
+    return result;
   } catch (error) {
     console.error(`API Call failed for ${url}:`, error);
     setType("error");
     setMessage("Failed to connect to server");
-    return null;
+    return { success: false, message: "Failed to connect to server" };
   }
 }
