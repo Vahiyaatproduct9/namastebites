@@ -47,7 +47,7 @@ export async function getLocationDetails(ctx: Context) {
   try {
     const addressDetails = await getAddressFromCoordinates(latitude, longitude);
     console.log("addressDetails: ", addressDetails);
-    return {
+    const data = {
       status: 200,
       message: "Location details fetched successfully",
       success: true,
@@ -56,6 +56,8 @@ export async function getLocationDetails(ctx: Context) {
         distance: distanceKm,
       },
     };
+    console.log("data: ", data);
+    return data;
   } catch (error) {
     return {
       status: 500,

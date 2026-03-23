@@ -1,17 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import path from "@/app/path/path";
-import { CartItem, JsonResponse, RazorPayVerify } from "@/app/types/types";
-import withResult from "../../internal/withResult";
+import { APICall } from "../apiClient";
+import { CartItem, RazorPayVerify } from "@/app/types/types";
 import useMessage from "@/app/store/useMessage";
 import { useCart } from "@/app/store/useCart";
 import { NEXT_PUBLIC_RZP_KEY } from "@/app/env";
 const setMessage = useMessage.getState().setMessage;
-const setType = useMessage.getState().setType;
 const clearCart = useCart.getState().clearCart;
-const defaultErrMsg = "Something went wrong!";
-// 2 function
-// online Payment
-// offline Payment
 
 /*
  * Used for offline payments
@@ -21,21 +15,15 @@ async function PaymentCashOnDelivery(data: {
   instruction: string;
   user_id: string;
 }) {
-  const response = await withResult(
-    fetch(`${path}/payment/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        items: data.data,
-        special_instructions: data.instruction,
-        user_id: data.user_id,
-        mode: "cash_on_delivery",
-      }),
-    }),
-  );
-  return response;
+  return await APICall("/payment/create", {
+    method: "POST",
+    body: {
+      items: data.data,
+      special_instructions: data.instruction,
+      user_id: data.user_id,
+      mode: "cash_on_delivery",
+    },
+  });
 }
 
 /*
@@ -51,21 +39,28 @@ async function PaymentOnline(data: {
     email: string;
   };
 }): Promise<boolean> {
-  const response = await initiatePaymentOnline({
-    items: data.data,
-    instruction: data.instruction,
-    user_id: data.user.id,
+  const response = await APICall("/payment/create", {
+    method: "POST",
+    body: {
+      items: data.data,
+      instruction: data.instruction,
+      user_id: data.user.id,
+      mode: "online",
+    },
   });
+
+  if (!response || !response.order) {
+    setMessage("No Order Found. Make sure you have listed your orders.");
+    return false;
+  }
+
   const { order } = response;
   const rzpScreenData = {
     order,
     user: data.user,
     instruction: data.instruction,
   };
-  if (!order) {
-    setMessage("No Order Found. Make sure you have listed your orders.");
-    return false;
-  }
+
   try {
     const checkoutResponse = await showRzpScreen(rzpScreenData);
     if (!checkoutResponse) {
@@ -81,34 +76,6 @@ async function PaymentOnline(data: {
     console.error("Payment process failed:", error);
     return false;
   }
-}
-
-/*
- * I;m not sure about this
- * maybe we could bring the rzp screen to this file.
- */
-
-// AS YOU CAN SEE I HAVE
-// ADD THE ONLINE AND OFFLINE PAYMENT METHODS
-// LETS CONTINUE TO APPLY THIS IN THE BACKEND SYSTEM
-async function initiatePaymentOnline(data: {
-  items: CartItem[];
-  instruction: string;
-  user_id: string;
-}) {
-  const response = await withResult(
-    fetch(`${path}/payment/create`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...data,
-        mode: "online",
-      }),
-    }),
-  );
-  return response;
 }
 
 async function showRzpScreen(data: {
@@ -170,27 +137,17 @@ async function verifyPayment(
     user_id: string | null;
   },
 ): Promise<boolean> {
-  const response = await fetch(`${path}/payment/verify`, {
+  const response = await APICall("/payment/verify", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
+    body: data,
   });
-  if (!response.ok) {
-    setMessage("Payment verification failed!");
-    return false;
+
+  if (response) {
+    // APICall already handles success message if returned in result.message
+    // and returns result.data which is likely true or additional data.
+    return true;
   }
-  const { success, message }: JsonResponse = await response.json();
-  setType(success ? "success" : "error");
-  setMessage(message || defaultErrMsg);
-  if (!success) {
-    setMessage(message || defaultErrMsg);
-    setType("error");
-    return false;
-  }
-  // clearCart();
-  return true;
+  return false;
 }
 
 const order = {

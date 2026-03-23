@@ -22,7 +22,7 @@ const Orders = () => {
         return;
       }
       const result = await getOrders(token);
-      if (!(result instanceof Error)) {
+      if (result) {
         setOrders(result);
       }
       setLoading(false);

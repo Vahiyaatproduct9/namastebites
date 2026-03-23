@@ -1,9 +1,6 @@
-import withResult from "../../internal/withResult";
-import path from "@/app/path/path";
-
+import { APICall } from "../apiClient";
 import useMessage from "@/app/store/useMessage";
-const setMessage = useMessage.getState().setMessage;
-const setType = useMessage.getState().setType;
+
 export async function updateUser(
   data: {
     phone?: string;
@@ -12,19 +9,20 @@ export async function updateUser(
   },
   token: string | null | undefined,
 ) {
+  const setMessage = useMessage.getState().setMessage;
+  const setType = useMessage.getState().setType;
+
   if (!token) {
     setType("error");
     setMessage("Please login to update your profile");
+    return null;
   }
-  const res = await withResult(
-    fetch(`${path}/user/`, {
-      method: "PATCH",
-      headers: {
-        authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ data }),
-    }),
-  );
-  return res;
+
+  return await APICall("/user/", {
+    method: "PATCH",
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+    body: { data },
+  });
 }
