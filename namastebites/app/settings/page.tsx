@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import "./settings.css";
 import useMessage from "../store/useMessage";
 import { useLocation } from "../store/useLocation";
@@ -12,7 +12,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import useProfile from "../store/useProfile";
 import { useUser } from "@clerk/nextjs";
 
-const Settings = () => {
+const SettingsContent = () => {
   const { user } = useUser();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -211,12 +211,16 @@ const Settings = () => {
                 onChange={handlePhoneInputChange}
                 placeholder="Enter 10-11 digit phone number"
               />
-              <button 
-                className="save-phone-btn" 
+              <button
+                className="save-phone-btn"
                 onClick={handlePhoneSave}
                 disabled={savingPhone}
               >
-                {savingPhone ? <div className="loading-spinner-small"></div> : "Save Phone"}
+                {savingPhone ? (
+                  <div className="loading-spinner-small"></div>
+                ) : (
+                  "Save Phone"
+                )}
               </button>
             </div>
             {(!phone || phone.length < 10 || phone.length > 11) && (
@@ -303,7 +307,10 @@ const Settings = () => {
 
         {fromCart && (
           <div className="cart-navigation">
-            <button className="back-to-cart-btn" onClick={() => router.push("/cart")}>
+            <button
+              className="back-to-cart-btn"
+              onClick={() => router.push("/cart")}
+            >
               <span className="material-symbols-outlined">shopping_cart</span>
               Back to Cart
             </button>
@@ -311,6 +318,14 @@ const Settings = () => {
         )}
       </div>
     </div>
+  );
+};
+
+const Settings = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 };
 
